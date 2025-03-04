@@ -13,11 +13,11 @@ import java.util.List;
 @Getter
 @Setter
 public class JobPositionRequest {
-
+    private int id;
     private String code;
     private String name;
     private IndustryEntity industry;
     private String description;
-    private List<Line> lines;
+    private List<LineRequest> lines;
     private Boolean isActive;
 }

@@ -1,39 +1,28 @@
 package org.example.quanlytuyendung.entity;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
-
 @AllArgsConstructor
 @NoArgsConstructor
-@Getter
-@Setter
 @Entity
-@Table(name = "industry", uniqueConstraints = {
-        @UniqueConstraint(columnNames = "name"),
-        @UniqueConstraint(columnNames = "code")
-})
-public class IndustryEntity {
+@Table(name = "tag_entity")
+@Data
+public class TagEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-
-    @Column(nullable = false, unique = true)
     private String name;
 
-    @Column(nullable = false, unique = true)
-    @Pattern(regexp = "^[a-zA-Z0-9]+$", message = "Code không được chứa ký tự đặc biệt")
-    private String code;
-
-    private String description;
-    private Boolean isActive;
+    @Column(name = "isActive")
+    @JsonProperty("isActive")
+    private Boolean active;
 
     @CreationTimestamp
     @Column(updatable = false)
@@ -41,4 +30,11 @@ public class IndustryEntity {
 
     @UpdateTimestamp
     private LocalDateTime updatedAt;
+
+
+    public TagEntity(Integer id, String name, Boolean active) {
+        this.id = id;
+        this.name = name;
+        this.active = active;
+    }
 }

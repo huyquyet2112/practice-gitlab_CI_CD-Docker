@@ -48,4 +48,5 @@ public class JobPositionEntity {
     @UpdateTimestamp
     private LocalDateTime updatedAt;
 
+
 }

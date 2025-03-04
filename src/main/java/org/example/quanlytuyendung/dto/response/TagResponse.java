@@ -2,28 +2,20 @@ package org.example.quanlytuyendung.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
-import org.example.quanlytuyendung.dto.request.LineRequest;
-
-import java.util.List;
 
 @AllArgsConstructor
 @NoArgsConstructor
-@Getter
-@Setter
+@Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class JobPositionResponse {
+
+public class TagResponse {
     private Integer id;
-    private String code;
     private String name;
-    private IndustryResponse industry;
-    private List<LineResponse> lines;
-    private String description;
     private Boolean isActive;
 
-    public JobPositionResponse(int id) {
+    public TagResponse(Integer id) {
         this.id = id;
     }
 }

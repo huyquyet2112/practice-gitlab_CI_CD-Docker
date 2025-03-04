@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface JobPositionRepository extends JpaRepository<JobPositionEntity, Integer> {
+    boolean existsByCode(String code);
 }

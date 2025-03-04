@@ -61,8 +61,8 @@ public class IndustryServiceImpl implements IndustryService {
 
     @Override
     public IndustryResponse update(IndustryRequest industryRequest) {
-        IndustryEntity industryEntity1 = industryRepo.getReferenceById(industryRequest.getId());
-        IndustryEntity industryEntity = industryRepo.findById(industryEntity1.getId())
+
+        IndustryEntity industryEntity = industryRepo.findById(industryRequest.getId())
                 .orElseThrow(() -> new RuntimeException("Id doesn't exist!"));
 
         boolean isDuplicateCode = industryRepo.existsByCode(industryRequest.getCode()) &&
