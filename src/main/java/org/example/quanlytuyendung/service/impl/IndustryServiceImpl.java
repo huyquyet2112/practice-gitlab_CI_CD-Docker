@@ -1,5 +1,6 @@
 package org.example.quanlytuyendung.service.impl;
 
+import lombok.RequiredArgsConstructor;
 import org.example.quanlytuyendung.dto.request.IndustryRequest;
 import org.example.quanlytuyendung.dto.response.ApiResponse;
 import org.example.quanlytuyendung.dto.response.IndustryResponse;
@@ -15,16 +16,14 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-
+@RequiredArgsConstructor
 @Service
 public class IndustryServiceImpl implements IndustryService {
 
     private final IndustryRepository industryRepo;
-    @Autowired
-    public IndustryServiceImpl(IndustryRepository industryRepo) {
-        this.industryRepo = industryRepo;
-    }
+    private final IndustryMapper industryMapper;
+
+
 
 
     @Override
@@ -41,34 +40,30 @@ public class IndustryServiceImpl implements IndustryService {
                 .totalElements(pageData.getTotalElements())
                 .numberOfElements(pageData.getNumberOfElements())
                 .content(pageData.getContent().stream()
-                        .map(IndustryMapper::toResponse)
+                        .map(industryMapper::toResponse)
                         .toList())
                 .build();
     }
 
-
-
-
     @Override
     public IndustryResponse save(IndustryRequest industryRequest) {
         if (industryRepo.existsByCode(industryRequest.getCode())) {
-            throw new IllegalArgumentException("Try again! Code exists!");
+            throw new IllegalArgumentException("Try again! Code already exists.");
         }
-        IndustryEntity industryEntity = IndustryMapper.toModel(industryRequest);
+        IndustryEntity industryEntity = industryMapper.toModel(industryRequest);
         industryEntity = industryRepo.save(industryEntity);
-        return IndustryMapper.toResponseId(industryEntity);
+        return industryMapper.toResponseId(industryEntity);
     }
 
     @Override
     public IndustryResponse update(IndustryRequest industryRequest) {
-
         IndustryEntity industryEntity = industryRepo.findById(industryRequest.getId())
-                .orElseThrow(() -> new RuntimeException("Id doesn't exist!"));
+                .orElseThrow(() -> new RuntimeException("Industry with ID " + industryRequest.getId() + " doesn't exist."));
 
         boolean isDuplicateCode = industryRepo.existsByCode(industryRequest.getCode()) &&
                 !industryEntity.getCode().equals(industryRequest.getCode());
         if (isDuplicateCode) {
-            throw new RuntimeException("Id doesn't exist!");
+            throw new RuntimeException("Code '" + industryRequest.getCode() + "' already exists.");
         }
 
         industryEntity.setName(industryRequest.getName());
@@ -80,26 +75,22 @@ public class IndustryServiceImpl implements IndustryService {
         }
 
         IndustryEntity updatedEntity = industryRepo.save(industryEntity);
-        return IndustryMapper.toResponseId(updatedEntity);
+        return industryMapper.toResponseId(updatedEntity);
     }
 
     @Override
     public ApiResponse<IndustryResponse> findIndustry(int id) {
         IndustryEntity industry = industryRepo.findById(id)
-                .orElseThrow(() -> new RuntimeException("Industry not found!"));
-        IndustryResponse response = IndustryMapper.toResponseDetails(industry);
+                .orElseThrow(() -> new RuntimeException("Industry with ID " + id + " not found."));
+        IndustryResponse response = industryMapper.toResponseDetails(industry);
         return new ApiResponse<>(response);
     }
 
-
-
     @Override
     public IndustryEntity deleteIndustry(int id) {
-        IndustryEntity industryEntity = industryRepo.getReferenceById(id);
+        IndustryEntity industryEntity = industryRepo.findById(id)
+                .orElseThrow(() -> new RuntimeException("Industry with ID " + id + " not found."));
         industryRepo.delete(industryEntity);
-
-        return null;
+        return industryEntity;
     }
-
-
 }

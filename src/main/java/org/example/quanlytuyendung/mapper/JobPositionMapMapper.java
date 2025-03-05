@@ -1,24 +1,21 @@
 package org.example.quanlytuyendung.mapper;
 
 import org.example.quanlytuyendung.dto.response.DepartmentResponse;
-import org.example.quanlytuyendung.dto.response.JobPositionResponse;
 import org.example.quanlytuyendung.dto.response.LineResponse;
 import org.example.quanlytuyendung.dto.response.PositionResponse;
-import org.example.quanlytuyendung.entity.JobPositionEntity;
 import org.example.quanlytuyendung.entity.JobPositionEntityMap;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.factory.Mappers;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.Collections;
 
-public class JobPositionMapMapper {
-    public static LineResponse toResponse(JobPositionEntityMap jobPositionEntityMap) {
-        DepartmentResponse departmentResponse = new DepartmentResponse(jobPositionEntityMap.getDepartmentId());
+@Mapper(componentModel = "spring")
+public interface JobPositionMapMapper {
 
-        List<PositionResponse> positions = new ArrayList<>();
-        positions.add(new PositionResponse(jobPositionEntityMap.getPositionId()));
-        return new LineResponse(departmentResponse, positions);
-    }
+    JobPositionMapMapper INSTANCE = Mappers.getMapper(JobPositionMapMapper.class);
 
+    @Mapping(target = "departmentResponse", expression = "java(new DepartmentResponse(jobPositionEntityMap.getDepartmentId()))")
+    @Mapping(target = "positions", expression = "java(Collections.singletonList(new PositionResponse(jobPositionEntityMap.getPositionId())))")
+    LineResponse toResponse(JobPositionEntityMap jobPositionEntityMap);
 }
-

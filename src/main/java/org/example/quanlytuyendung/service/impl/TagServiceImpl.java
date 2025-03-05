@@ -1,5 +1,6 @@
 package org.example.quanlytuyendung.service.impl;
 
+import lombok.RequiredArgsConstructor;
 import org.example.quanlytuyendung.dto.request.TagRequest;
 import org.example.quanlytuyendung.dto.response.ApiResponse;
 import org.example.quanlytuyendung.dto.response.PageableResponse;
@@ -15,14 +16,12 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.stream.Collectors;
-
+@RequiredArgsConstructor
 @Service
 public class TagServiceImpl implements TagService {
     private final TagRepository tagRepository;
+    private final TagMapper tagMapper;
 
-    public TagServiceImpl(TagRepository tagRepository) {
-        this.tagRepository = tagRepository;
-    }
 
     @Override
     public ApiResponse<PageableResponse<TagResponse>> getAllTag(int page, int size) {
@@ -37,7 +36,7 @@ public class TagServiceImpl implements TagService {
                .totalElements(tagEntities.getTotalElements())
                .totalElements(tagEntities.getTotalElements())
                .numberOfElements(tagEntities.getNumberOfElements())
-               .content(tagEntities.getContent().stream().map(TagMapper::toResponse).collect(Collectors.toList()))
+               .content(tagEntities.getContent().stream().map(tagMapper::toResponse).collect(Collectors.toList()))
                .build();
 
         return new ApiResponse<>(pageableResponse) ;
@@ -48,7 +47,7 @@ public class TagServiceImpl implements TagService {
         if(tagRepository.existsByName(tagRequest.getName())) {
             throw new IllegalArgumentException("Try again! Name exists!");
         }
-        TagEntity tagEntity = TagMapper.toTagEntity(tagRequest);
+        TagEntity tagEntity = tagMapper.toEntity(tagRequest);
         tagRepository.save(tagEntity);
         return new TagResponse(tagEntity.getId());
     }
@@ -60,5 +59,18 @@ public class TagServiceImpl implements TagService {
         tagEntity.setActive(tagRequest.getIsActive());
         tagRepository.save(tagEntity);
         return new TagResponse(tagEntity.getId());
+    }
+
+    @Override
+    public TagResponse getTag(int id) {
+        TagEntity tagEntity = tagRepository.findById(id).orElseThrow(() -> new RuntimeException("Job Position not found!"));
+        return tagMapper.toResponse(tagEntity);
+    }
+
+    @Override
+    public TagEntity deleteTag(int id) {
+        TagEntity tagEntity = tagRepository.findById(id).orElseThrow(() -> new RuntimeException("Job Position not found!"));
+        tagRepository.delete(tagEntity);
+        return null;
     }
 }

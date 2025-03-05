@@ -1,66 +1,43 @@
 package org.example.quanlytuyendung.mapper;
 
 import org.example.quanlytuyendung.dto.request.JobPositionRequest;
-import org.example.quanlytuyendung.dto.request.LineRequest;
-import org.example.quanlytuyendung.dto.response.*;
+import org.example.quanlytuyendung.dto.response.JobPositionResponse;
+import org.example.quanlytuyendung.dto.response.LineResponse;
 import org.example.quanlytuyendung.entity.JobPositionEntity;
 import org.example.quanlytuyendung.entity.JobPositionEntityMap;
-import org.springframework.stereotype.Component;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.Named;
+import org.mapstruct.factory.Mappers;
+import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Component
-public class JobPositionMapper {
-    public static JobPositionResponse toResponseList(JobPositionEntity jobPositionEntity) {
-        if (jobPositionEntity == null) {
-            return null;
-        }
+@Mapper(componentModel = "spring", uses = {JobPositionMapMapper.class})
+public interface JobPositionMapper {
 
-        return new JobPositionResponse(
-                null,
-                jobPositionEntity.getCode(),
-                jobPositionEntity.getName(),
-                IndustryMapper.toResponseName(jobPositionEntity.getIndustry()),
-                null,
-                null,
-                jobPositionEntity.getIsActive()
-        );
-    }
+    JobPositionMapper INSTANCE = Mappers.getMapper(JobPositionMapper.class);
 
-    public static JobPositionEntity toEntity(JobPositionRequest request) {
-        JobPositionEntity entity = new JobPositionEntity();
-        entity.setCode(request.getCode());
-        entity.setName(request.getName());
-        entity.setIndustry(request.getIndustry());
-        entity.setDescription(request.getDescription());
-        entity.setIsActive(request.getIsActive());
-        return entity;
-    }
-    public static JobPositionResponse toResponseDetails(JobPositionEntity jobPositionEntity, List<JobPositionEntityMap> jobPositionEntityMaps) {
-        if (jobPositionEntity == null) {
-            return null;
-        }
+    // Chuyển từ JobPositionEntity sang JobPositionResponse (danh sách)
+    @Mapping(target = "industry", ignore = true)
+    @Mapping(target = "lines", ignore = true)
+    @Mapping(target = "otherField", ignore = true) // Nếu có thêm trường cần bỏ qua
+    JobPositionResponse toResponseList(JobPositionEntity jobPositionEntity);
 
+    // Chuyển từ JobPositionRequest sang JobPositionEntity
+    JobPositionEntity toEntity(JobPositionRequest request);
 
-        List<LineResponse> lines = jobPositionEntityMaps.stream()
-                .map(JobPositionMapMapper::toResponse)
+    // Chuyển từ JobPositionEntity sang JobPositionResponse (chi tiết)
+    @Mapping(target = "industry", ignore = true)
+    @Mapping(source = "jobPositionEntityMaps", target = "lines", qualifiedByName = "mapLines")
+    JobPositionResponse toResponseDetails(JobPositionEntity jobPositionEntity, List<JobPositionEntityMap> jobPositionEntityMaps);
+
+    // Xử lý danh sách JobPositionEntityMap -> LineResponse
+    @Named("mapLines")
+    static List<LineResponse> mapLines(List<JobPositionEntityMap> jobPositionEntityMaps) {
+        return jobPositionEntityMaps.stream()
+                .map(JobPositionMapMapper.INSTANCE::toResponse)
                 .collect(Collectors.toList());
-
-        return new JobPositionResponse(
-                null,
-                jobPositionEntity.getCode(),
-                jobPositionEntity.getName(),
-                IndustryMapper.toResponseName(jobPositionEntity.getIndustry()),
-                lines,
-                null,
-                jobPositionEntity.getIsActive()
-        );
     }
-
-
-
 }
-

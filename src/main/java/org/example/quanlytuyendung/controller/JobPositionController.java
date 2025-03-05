@@ -1,5 +1,6 @@
 package org.example.quanlytuyendung.controller;
 
+import lombok.RequiredArgsConstructor;
 import org.example.quanlytuyendung.dto.request.JobPositionRequest;
 import org.example.quanlytuyendung.dto.response.ApiResponse;
 import org.example.quanlytuyendung.dto.response.JobPositionResponse;
@@ -13,13 +14,11 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/job-position")
+@RequiredArgsConstructor
 public class JobPositionController {
 
     private final JobpositionService jobpositionService;
-    @Autowired
-    public JobPositionController(JobpositionService jobpositionService) {
-        this.jobpositionService = jobpositionService;
-    }
+
     @GetMapping("/list")
     public ResponseEntity<ApiResponse<PageableResponse<JobPositionResponse>>> getAllJobPosition(
             @RequestParam(defaultValue = "0") int page,

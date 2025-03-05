@@ -1,5 +1,6 @@
 package org.example.quanlytuyendung.controller;
 
+import lombok.RequiredArgsConstructor;
 import org.example.quanlytuyendung.dto.request.IndustryRequest;
 import org.example.quanlytuyendung.dto.response.ApiResponse;
 import org.example.quanlytuyendung.dto.response.IndustryResponse;
@@ -11,13 +12,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/api/v1/industry")
 public class IndustryController {
     private final IndustryService industryService;
-    @Autowired
-    public IndustryController(IndustryService industryService) {
-        this.industryService = industryService;
-    }
+
     @GetMapping("/list")
     public ResponseEntity<PageableResponse<IndustryResponse>> getAllIndustries(
             @RequestParam(defaultValue = "0") int page,

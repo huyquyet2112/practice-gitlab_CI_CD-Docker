@@ -3,26 +3,17 @@ package org.example.quanlytuyendung.mapper;
 import org.example.quanlytuyendung.dto.request.TagRequest;
 import org.example.quanlytuyendung.dto.response.TagResponse;
 import org.example.quanlytuyendung.entity.TagEntity;
-import org.springframework.stereotype.Component;
+import org.mapstruct.Mapper;
+import org.mapstruct.factory.Mappers;
 
-@Component
-public class TagMapper {
-    public static TagResponse toResponse(TagEntity tagEntity) {
-        if (tagEntity == null) return null;
-        return  new TagResponse(
-                null,
-                tagEntity.getName(),
-                tagEntity.getActive()
-        );
+@Mapper(componentModel = "spring")
+public interface TagMapper {
 
-    }
-    public static TagEntity toTagEntity(TagRequest tagRequest) {
-        if (tagRequest == null) return null;
-        return new TagEntity(
-                null,
-                tagRequest.getName(),
-                tagRequest.getIsActive()
-        );
-    }
+    TagMapper INSTANCE = Mappers.getMapper(TagMapper.class);
 
+    // Chuyển từ TagEntity sang TagResponse
+    TagResponse toResponse(TagEntity tagEntity);
+
+    // Chuyển từ TagRequest sang TagEntity
+    TagEntity toEntity(TagRequest tagRequest);
 }
