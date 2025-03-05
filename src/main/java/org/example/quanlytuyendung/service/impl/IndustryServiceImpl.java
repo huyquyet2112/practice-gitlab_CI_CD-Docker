@@ -27,12 +27,12 @@ public class IndustryServiceImpl implements IndustryService {
 
 
     @Override
-    public PageableResponse<IndustryResponse> findAll(int page, int size) {
+    public ApiResponse<PageableResponse<IndustryResponse>> findAll(int page, int size) {
         Sort sort = Sort.by(Sort.Direction.DESC, "createdAt");
         Pageable pageable = PageRequest.of(page, size, sort);
         Page<IndustryEntity> pageData = industryRepo.findAll(pageable);
 
-        return PageableResponse.<IndustryResponse>builder()
+        PageableResponse pageableResponse =  PageableResponse.<IndustryResponse>builder()
                 .page(page)
                 .size(size)
                 .sort(sort.toString())
@@ -43,6 +43,7 @@ public class IndustryServiceImpl implements IndustryService {
                         .map(industryMapper::toResponse)
                         .toList())
                 .build();
+        return new ApiResponse<>(pageableResponse);
     }
 
     @Override
@@ -52,7 +53,7 @@ public class IndustryServiceImpl implements IndustryService {
         }
         IndustryEntity industryEntity = industryMapper.toModel(industryRequest);
         industryEntity = industryRepo.save(industryEntity);
-        return industryMapper.toResponseId(industryEntity);
+        return new IndustryResponse(industryEntity.getId()) ;
     }
 
     @Override
@@ -75,14 +76,14 @@ public class IndustryServiceImpl implements IndustryService {
         }
 
         IndustryEntity updatedEntity = industryRepo.save(industryEntity);
-        return industryMapper.toResponseId(updatedEntity);
+        return new IndustryResponse(updatedEntity.getId()) ;
     }
 
     @Override
     public ApiResponse<IndustryResponse> findIndustry(int id) {
         IndustryEntity industry = industryRepo.findById(id)
                 .orElseThrow(() -> new RuntimeException("Industry with ID " + id + " not found."));
-        IndustryResponse response = industryMapper.toResponseDetails(industry);
+        IndustryResponse response = industryMapper.toResponse(industry);
         return new ApiResponse<>(response);
     }
 
@@ -91,6 +92,6 @@ public class IndustryServiceImpl implements IndustryService {
         IndustryEntity industryEntity = industryRepo.findById(id)
                 .orElseThrow(() -> new RuntimeException("Industry with ID " + id + " not found."));
         industryRepo.delete(industryEntity);
-        return industryEntity;
+        return null;
     }
 }

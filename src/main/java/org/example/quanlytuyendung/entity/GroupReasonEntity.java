@@ -16,10 +16,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @Entity
-@Table(name = "group_reason", uniqueConstraints = {
-        @UniqueConstraint(columnNames = "name"),
-        @UniqueConstraint(columnNames = "code")
-})
+@Table(name = "group_reason")
 public class GroupReasonEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,7 +25,7 @@ public class GroupReasonEntity {
     @Column(nullable = false, unique = true)
     private String name;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     @Pattern(regexp = "^[a-zA-Z0-9]+$", message = "Code không được chứa ký tự đặc biệt")
     private String code;
 

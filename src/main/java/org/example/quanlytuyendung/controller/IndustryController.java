@@ -8,6 +8,7 @@ import org.example.quanlytuyendung.dto.response.PageableResponse;
 import org.example.quanlytuyendung.entity.IndustryEntity;
 import org.example.quanlytuyendung.service.IndustryService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,12 +19,12 @@ public class IndustryController {
     private final IndustryService industryService;
 
     @GetMapping("/list")
-    public ResponseEntity<PageableResponse<IndustryResponse>> getAllIndustries(
+    public ResponseEntity<ApiResponse <PageableResponse<IndustryResponse>>> getAllIndustries(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
     ) {
-        PageableResponse<IndustryResponse> industryPage = industryService.findAll(page, size);
-        return ResponseEntity.ok(industryPage);
+       ApiResponse<PageableResponse<IndustryResponse>> industryPage = industryService.findAll(page, size);
+        return   new ResponseEntity<>(industryPage, HttpStatus.OK);
     }
 
 

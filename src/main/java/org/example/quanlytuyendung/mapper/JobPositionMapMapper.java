@@ -4,18 +4,23 @@ import org.example.quanlytuyendung.dto.response.DepartmentResponse;
 import org.example.quanlytuyendung.dto.response.LineResponse;
 import org.example.quanlytuyendung.dto.response.PositionResponse;
 import org.example.quanlytuyendung.entity.JobPositionEntityMap;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.factory.Mappers;
-
+import org.mapstruct.*;
 import java.util.Collections;
+import java.util.List;
 
 @Mapper(componentModel = "spring")
 public interface JobPositionMapMapper {
-
-    JobPositionMapMapper INSTANCE = Mappers.getMapper(JobPositionMapMapper.class);
-
-    @Mapping(target = "departmentResponse", expression = "java(new DepartmentResponse(jobPositionEntityMap.getDepartmentId()))")
-    @Mapping(target = "positions", expression = "java(Collections.singletonList(new PositionResponse(jobPositionEntityMap.getPositionId())))")
+    @Mapping(target = "department", source = "departmentId", qualifiedByName = "mapDepartment")
+    @Mapping(target = "positions", source = "positionId", qualifiedByName = "mapPositions")
     LineResponse toResponse(JobPositionEntityMap jobPositionEntityMap);
+
+    @Named("mapDepartment")
+    static DepartmentResponse mapDepartment(int departmentId) {
+        return new DepartmentResponse(departmentId);
+    }
+
+    @Named("mapPositions")
+    static List<PositionResponse> mapPositions(int positionId) {
+        return Collections.singletonList(new PositionResponse(positionId));
+    }
 }

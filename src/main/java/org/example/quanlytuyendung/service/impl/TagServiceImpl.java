@@ -56,7 +56,7 @@ public class TagServiceImpl implements TagService {
     public TagResponse updateTag(TagRequest tagRequest) {
         TagEntity tagEntity = tagRepository.findById(tagRequest.getId()).orElseThrow(() -> new RuntimeException("Job Position not found!"));
         tagEntity.setName(tagRequest.getName());
-        tagEntity.setActive(tagRequest.getIsActive());
+        tagEntity.setIsActive(tagRequest.getIsActive());
         tagRepository.save(tagEntity);
         return new TagResponse(tagEntity.getId());
     }

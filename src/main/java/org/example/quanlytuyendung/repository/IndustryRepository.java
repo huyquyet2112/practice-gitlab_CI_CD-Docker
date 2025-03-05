@@ -8,6 +8,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface IndustryRepository extends JpaRepository<IndustryEntity, Integer> {
-    boolean existsByCode(String code);
+    Boolean existsByCode(String code);
     Page<IndustryEntity> findAll(Pageable pageable);
 }

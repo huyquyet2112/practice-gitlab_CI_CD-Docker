@@ -1,7 +1,6 @@
 package org.example.quanlytuyendung.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -20,5 +19,12 @@ public class IndustryResponse {
     private Boolean isActive;
 
 
+    public IndustryResponse(Integer id) {
+        this.id = id;
+    }
 
+    public IndustryResponse(String code, String name) {
+        this.code = code;
+        this.name = name;
+    }
 }

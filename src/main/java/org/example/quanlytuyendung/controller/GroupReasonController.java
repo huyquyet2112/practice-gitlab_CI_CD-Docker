@@ -1,16 +1,15 @@
 package org.example.quanlytuyendung.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.example.quanlytuyendung.dto.request.GroupReasonRequest;
 import org.example.quanlytuyendung.dto.response.ApiResponse;
 import org.example.quanlytuyendung.dto.response.GroupReasonResponse;
 import org.example.quanlytuyendung.dto.response.PageableResponse;
+import org.example.quanlytuyendung.entity.GroupReasonEntity;
 import org.example.quanlytuyendung.service.GroupReasonService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -25,6 +24,25 @@ public class GroupReasonController {
             @RequestParam(defaultValue = "10") int size) {
         ApiResponse<PageableResponse<GroupReasonResponse>> pageableResponseApiResponse = groupReasonService.findAll(page,size);
         return new ResponseEntity<>(pageableResponseApiResponse, HttpStatus.OK);
-
+    }
+    @PostMapping
+    public ResponseEntity<GroupReasonResponse> addGroupReason(@RequestBody GroupReasonRequest groupReasonRequest) {
+        GroupReasonResponse groupReasonResponse = groupReasonService.addGroupReason(groupReasonRequest);
+        return new ResponseEntity<>(groupReasonResponse, HttpStatus.OK);
+    }
+    @PutMapping
+    public ResponseEntity<GroupReasonResponse> updateGroupReason(@RequestBody GroupReasonRequest groupReasonRequest) {
+        GroupReasonResponse groupReasonResponse = groupReasonService.updateGroupReason(groupReasonRequest);
+        return new ResponseEntity<>(groupReasonResponse, HttpStatus.OK);
+    }
+    @GetMapping
+    public ResponseEntity<ApiResponse<GroupReasonResponse>> detailsGroupReason(@RequestParam int id) {
+        ApiResponse<GroupReasonResponse> groupReasonResponseApiResponse = groupReasonService.detailsGroupReason(id);
+        return new ResponseEntity<>(groupReasonResponseApiResponse, HttpStatus.OK);
+    }
+    @DeleteMapping
+    public ResponseEntity<GroupReasonEntity> deleteGroupReason(@RequestParam int id) {
+        GroupReasonEntity groupReasonEntity = groupReasonService.deleteGroupReason(id);
+        return new ResponseEntity<>(groupReasonEntity, HttpStatus.OK);
     }
 }

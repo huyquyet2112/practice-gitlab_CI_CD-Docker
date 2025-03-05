@@ -12,7 +12,7 @@ public interface IndustryService {
 
 
 
-     PageableResponse<IndustryResponse> findAll(int page, int size);
+    ApiResponse<PageableResponse<IndustryResponse>> findAll(int page, int size);
 
      IndustryResponse save(IndustryRequest industryRequest);
 

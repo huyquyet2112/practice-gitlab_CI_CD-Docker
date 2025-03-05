@@ -3,11 +3,14 @@ package org.example.quanlytuyendung.service.impl;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.example.quanlytuyendung.dto.request.JobPositionRequest;
+import org.example.quanlytuyendung.dto.request.PositionRequest;
 import org.example.quanlytuyendung.dto.response.ApiResponse;
 import org.example.quanlytuyendung.dto.response.JobPositionResponse;
+import org.example.quanlytuyendung.dto.response.LineResponse;
 import org.example.quanlytuyendung.dto.response.PageableResponse;
 import org.example.quanlytuyendung.entity.JobPositionEntity;
 import org.example.quanlytuyendung.entity.JobPositionEntityMap;
+import org.example.quanlytuyendung.mapper.IndustryMapper;
 import org.example.quanlytuyendung.mapper.JobPositionMapper;
 import org.example.quanlytuyendung.repository.JobPositionRepository;
 import org.example.quanlytuyendung.repository.JobPositiopMapRepository;
@@ -24,10 +27,11 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class JobPositionServiceImpl implements JobpositionService {
+public class JobPositionServiceImpl  implements JobpositionService {
     private final JobPositionRepository jobPositionRepository;
     private final JobPositiopMapRepository jobPositiopMapRepository;
     private final JobPositionMapper jobPositionMapper;
+
 
     @Override
     public ApiResponse<PageableResponse<JobPositionResponse>> findAll(int page, int size) {
@@ -69,6 +73,8 @@ public class JobPositionServiceImpl implements JobpositionService {
         return new JobPositionResponse(jobPositionEntity.getId());
     }
 
+
+
     @Override
     @Transactional
     public JobPositionResponse updatePosition(JobPositionRequest request) {
@@ -88,6 +94,7 @@ public class JobPositionServiceImpl implements JobpositionService {
         jobPositionEntity.setCode(request.getCode());
 
         List<JobPositionEntityMap> existingMaps = jobPositiopMapRepository.findByJobPosition(jobPositionEntity);
+
         Map<Integer, JobPositionEntityMap> existingMapByDept = new HashMap<>();
         for (JobPositionEntityMap map : existingMaps) {
             existingMapByDept.put(map.getDepartmentId(), map);
@@ -116,6 +123,7 @@ public class JobPositionServiceImpl implements JobpositionService {
         return new JobPositionResponse(jobPositionEntity.getId());
     }
 
+
     @Override
     public JobPositionResponse findPosition(int id) {
         JobPositionEntity jobPositionEntity = jobPositionRepository.findById(id)
@@ -132,4 +140,6 @@ public class JobPositionServiceImpl implements JobpositionService {
         jobPositionRepository.delete(jobPositionEntity);
         return null;
     }
+
+
 }

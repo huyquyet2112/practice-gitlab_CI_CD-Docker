@@ -22,7 +22,7 @@ public class TagEntity {
 
     @Column(name = "isActive")
     @JsonProperty("isActive")
-    private Boolean active;
+    private Boolean isActive;
 
     @CreationTimestamp
     @Column(updatable = false)
@@ -32,9 +32,4 @@ public class TagEntity {
     private LocalDateTime updatedAt;
 
 
-    public TagEntity(Integer id, String name, Boolean active) {
-        this.id = id;
-        this.name = name;
-        this.active = active;
-    }
 }
