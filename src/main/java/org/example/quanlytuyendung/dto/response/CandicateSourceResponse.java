@@ -9,18 +9,17 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class GroupReasonResponse {
+public class CandicateSourceResponse {
     private Integer id;
-    private String code;
     private String name;
-    private String description;
+    private String code;
     private Boolean isActive;
-
-    public GroupReasonResponse(Integer id) {
+    private String description;
+    public CandicateSourceResponse(Integer id) {
         this.id = id;
     }
 
-    public GroupReasonResponse(Integer id, String name) {
+    public CandicateSourceResponse(Integer id, String name) {
         this.id = id;
         this.name = name;
     }

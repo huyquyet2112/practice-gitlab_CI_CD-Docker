@@ -9,12 +9,16 @@ import org.example.quanlytuyendung.entity.TagEntity;
 import org.example.quanlytuyendung.mapper.TagMapper;
 import org.example.quanlytuyendung.repository.TagRepository;
 import org.example.quanlytuyendung.service.TagService;
+import org.example.quanlytuyendung.specification.BaseSpecification;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Service
@@ -24,23 +28,31 @@ public class TagServiceImpl implements TagService {
 
 
     @Override
-    public ApiResponse<PageableResponse<TagResponse>> getAllTag(int page, int size) {
+    public ApiResponse<PageableResponse<TagResponse>> getAllTag(int page, int size, TagResponse tagResponse) {
         Sort sort = Sort.by(Sort.Direction.DESC, "createdAt");
-        Pageable pageData = PageRequest.of(page, size, sort);
-        Page<TagEntity> tagEntities = tagRepository.findAll(pageData);
-       PageableResponse<TagResponse> pageableResponse = PageableResponse.<TagResponse>builder()
-               .page(page)
-               .size(size)
-               .sort(sort.toString())
-               .totalPages(tagEntities.getTotalPages())
-               .totalElements(tagEntities.getTotalElements())
-               .totalElements(tagEntities.getTotalElements())
-               .numberOfElements(tagEntities.getNumberOfElements())
-               .content(tagEntities.getContent().stream().map(tagMapper::toResponse).collect(Collectors.toList()))
-               .build();
+        Pageable pageable = PageRequest.of(page, size, sort);
 
-        return new ApiResponse<>(pageableResponse) ;
+        Map<String, Object> filter = new HashMap<>();
+        if (tagResponse.getName() != null) {
+            filter.put("name", tagResponse.getName());
+        }
+
+        Specification<TagEntity> specification = new BaseSpecification<>(filter);
+        var tagEntities = tagRepository.findAll(specification, pageable);
+
+        PageableResponse<TagResponse> pageableResponse = PageableResponse.<TagResponse>builder()
+                .page(page)
+                .size(size)
+                .sort(sort.toString())
+                .totalPages(tagEntities.getTotalPages())
+                .totalElements(tagEntities.getTotalElements())
+                .numberOfElements(tagEntities.getNumberOfElements())
+                .content(tagEntities.getContent().stream().map(tagMapper::toResponse).toList())
+                .build();
+
+        return new ApiResponse<>(pageableResponse);
     }
+
 
     @Override
     public TagResponse addTagg(TagRequest tagRequest) {

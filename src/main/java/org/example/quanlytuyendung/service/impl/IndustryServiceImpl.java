@@ -1,6 +1,7 @@
 package org.example.quanlytuyendung.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.example.quanlytuyendung.dto.request.IndustryRequest;
 import org.example.quanlytuyendung.dto.response.ApiResponse;
 import org.example.quanlytuyendung.dto.response.IndustryResponse;
@@ -9,13 +10,17 @@ import org.example.quanlytuyendung.mapper.IndustryMapper;
 import org.example.quanlytuyendung.entity.IndustryEntity;
 import org.example.quanlytuyendung.repository.IndustryRepository;
 import org.example.quanlytuyendung.service.IndustryService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
+import org.example.quanlytuyendung.specification.BaseSpecification;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
+import java.util.Map;
+
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class IndustryServiceImpl implements IndustryService {
@@ -27,12 +32,19 @@ public class IndustryServiceImpl implements IndustryService {
 
 
     @Override
-    public ApiResponse<PageableResponse<IndustryResponse>> findAll(int page, int size) {
+    public ApiResponse<PageableResponse<IndustryResponse>> findAll(int page, int size, IndustryResponse industryResponse) {
+
         Sort sort = Sort.by(Sort.Direction.DESC, "createdAt");
         Pageable pageable = PageRequest.of(page, size, sort);
-        Page<IndustryEntity> pageData = industryRepo.findAll(pageable);
+        Map<String, Object> filters = new HashMap<>();
+        if (industryResponse != null) {
+            if (industryResponse.getName() != null) filters.put("name", industryResponse.getName());
+            if (industryResponse.getCode() != null) filters.put("code", industryResponse.getCode());
+        }
+        Specification<IndustryEntity> spec = new BaseSpecification<>(filters);
+        var pageData = industryRepo.findAll(spec, pageable);
 
-        PageableResponse pageableResponse =  PageableResponse.<IndustryResponse>builder()
+        PageableResponse<IndustryResponse> pageableResponse = PageableResponse.<IndustryResponse>builder()
                 .page(page)
                 .size(size)
                 .sort(sort.toString())
@@ -43,8 +55,10 @@ public class IndustryServiceImpl implements IndustryService {
                         .map(industryMapper::toResponse)
                         .toList())
                 .build();
+
         return new ApiResponse<>(pageableResponse);
     }
+
 
     @Override
     public IndustryResponse save(IndustryRequest industryRequest) {

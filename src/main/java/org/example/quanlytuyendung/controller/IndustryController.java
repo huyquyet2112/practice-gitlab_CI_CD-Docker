@@ -20,10 +20,15 @@ public class IndustryController {
 
     @GetMapping("/list")
     public ResponseEntity<ApiResponse <PageableResponse<IndustryResponse>>> getAllIndustries(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size
+            @RequestParam(defaultValue = "0" , required = false) int page,
+            @RequestParam(defaultValue = "10", required = false) int size,
+            @RequestParam(value = "name",required = false)String name,
+            @RequestParam (value = "code",required = false)String code
     ) {
-       ApiResponse<PageableResponse<IndustryResponse>> industryPage = industryService.findAll(page, size);
+        IndustryResponse industryResponse = new IndustryResponse();
+        industryResponse.setName(name);
+        industryResponse.setCode(code);
+       ApiResponse<PageableResponse<IndustryResponse>> industryPage = industryService.findAll(page, size,industryResponse);
         return   new ResponseEntity<>(industryPage, HttpStatus.OK);
     }
 

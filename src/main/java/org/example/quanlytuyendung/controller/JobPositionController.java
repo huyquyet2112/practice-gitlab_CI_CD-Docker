@@ -22,9 +22,14 @@ public class JobPositionController {
     @GetMapping("/list")
     public ResponseEntity<ApiResponse<PageableResponse<JobPositionResponse>>> getAllJobPosition(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) String code) {
 
-        ApiResponse<PageableResponse<JobPositionResponse>> response = jobpositionService.findAll(page, size);
+        JobPositionResponse jobPositionResponse = new JobPositionResponse();
+        jobPositionResponse.setName(name);
+        jobPositionResponse.setCode(code);
+        ApiResponse<PageableResponse<JobPositionResponse>> response = jobpositionService.findAll(page, size,jobPositionResponse);
 
         return new ResponseEntity<>(response, HttpStatus.OK);
     }

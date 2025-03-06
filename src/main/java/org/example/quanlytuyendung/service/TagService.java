@@ -7,7 +7,7 @@ import org.example.quanlytuyendung.dto.response.TagResponse;
 import org.example.quanlytuyendung.entity.TagEntity;
 
 public interface TagService {
-    ApiResponse<PageableResponse<TagResponse>> getAllTag(int page, int size);
+    ApiResponse<PageableResponse<TagResponse>> getAllTag(int page, int size,TagResponse tagResponse);
 
     TagResponse addTagg(TagRequest tagRequest);
 

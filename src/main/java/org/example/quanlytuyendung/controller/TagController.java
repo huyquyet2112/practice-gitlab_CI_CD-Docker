@@ -20,10 +20,13 @@ public class TagController {
     @GetMapping("/list")
     public ResponseEntity <ApiResponse<PageableResponse<TagResponse>>> getAllTags(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size
-    ) {
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) String name
 
-        ApiResponse<PageableResponse<TagResponse>> apiResponse = tagService.getAllTag(page,size);
+    ) {
+        TagResponse tagResponse = new TagResponse();
+        tagResponse.setName(name);
+        ApiResponse<PageableResponse<TagResponse>> apiResponse = tagService.getAllTag(page,size,tagResponse);
         return ResponseEntity.ok(apiResponse);
     }
     @PostMapping

@@ -9,12 +9,16 @@ import org.example.quanlytuyendung.entity.GroupReasonEntity;
 import org.example.quanlytuyendung.mapper.GroupReasonMapper;
 import org.example.quanlytuyendung.repository.GroupReasonRepository;
 import org.example.quanlytuyendung.service.GroupReasonService;
+import org.example.quanlytuyendung.specification.BaseSpecification;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -27,19 +31,23 @@ public class GroupReasonServiceImpl implements GroupReasonService {
 
 
     @Override
-    public ApiResponse<PageableResponse<GroupReasonResponse>> findAll(int page, int size) {
+    public ApiResponse<PageableResponse<GroupReasonResponse>> findAll(int page, int size, GroupReasonResponse groupReasonResponse) {
         Sort sort = Sort.by(Sort.Direction.DESC, "id");
         Pageable pageable = PageRequest.of(page, size, sort);
-        Page<GroupReasonEntity> groupReasonEntities = groupReasonRepository.findAll(pageable);
+        Map<String,Object> filters = new HashMap<>();
+        if(groupReasonResponse.getCode() != null) filters.put("code", groupReasonResponse.getCode());
+        if(groupReasonResponse.getName() != null) filters.put("name", groupReasonResponse.getName());
+        Specification<GroupReasonEntity> spec = new BaseSpecification<>(filters) ;
+        var pageData = groupReasonRepository.findAll(spec,pageable);
         PageableResponse<GroupReasonResponse> pageableResponse = PageableResponse.<GroupReasonResponse>builder()
                 .page(page)
                 .size(size)
                 .sort(sort.toString())
-                .totalPages(groupReasonEntities.getTotalPages())
-                .totalElements(groupReasonEntities.getTotalElements())
-                .totalElements(groupReasonEntities.getTotalElements())
-                .numberOfElements(groupReasonEntities.getNumberOfElements())
-                .content(groupReasonEntities.getContent().stream().map(groupReasonMapper::toResponse).collect(Collectors.toList()))
+                .totalPages(pageData.getTotalPages())
+                .totalElements(pageData.getTotalElements())
+                .totalElements(pageData.getTotalElements())
+                .numberOfElements(pageData.getNumberOfElements())
+                .content(pageData.getContent().stream().map(groupReasonMapper::toResponse).collect(Collectors.toList()))
                 .build();
         return new ApiResponse<>(pageableResponse) ;
     }

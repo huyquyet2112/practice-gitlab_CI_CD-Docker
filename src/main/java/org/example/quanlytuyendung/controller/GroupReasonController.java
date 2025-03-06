@@ -21,8 +21,13 @@ public class GroupReasonController {
     @GetMapping("/list")
     public ResponseEntity<ApiResponse<PageableResponse<GroupReasonResponse>>> getAllGroupReason(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
-        ApiResponse<PageableResponse<GroupReasonResponse>> pageableResponseApiResponse = groupReasonService.findAll(page,size);
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) String code) {
+        GroupReasonResponse groupReasonResponse = new GroupReasonResponse();
+        groupReasonResponse.setName(name);
+        groupReasonResponse.setCode(code);
+        ApiResponse<PageableResponse<GroupReasonResponse>> pageableResponseApiResponse = groupReasonService.findAll(page,size,groupReasonResponse);
         return new ResponseEntity<>(pageableResponseApiResponse, HttpStatus.OK);
     }
     @PostMapping

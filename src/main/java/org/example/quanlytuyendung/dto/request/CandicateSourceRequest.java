@@ -1,4 +1,4 @@
-package org.example.quanlytuyendung.dto.response;
+package org.example.quanlytuyendung.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
@@ -9,19 +9,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class GroupReasonResponse {
+public class CandicateSourceRequest {
     private Integer id;
-    private String code;
     private String name;
+    private String code;
     private String description;
     private Boolean isActive;
-
-    public GroupReasonResponse(Integer id) {
-        this.id = id;
-    }
-
-    public GroupReasonResponse(Integer id, String name) {
-        this.id = id;
-        this.name = name;
-    }
 }

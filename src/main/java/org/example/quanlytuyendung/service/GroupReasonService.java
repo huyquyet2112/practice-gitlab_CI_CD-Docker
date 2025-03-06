@@ -7,7 +7,7 @@ import org.example.quanlytuyendung.dto.response.PageableResponse;
 import org.example.quanlytuyendung.entity.GroupReasonEntity;
 
 public interface GroupReasonService {
-    ApiResponse<PageableResponse<GroupReasonResponse>> findAll(int page, int size);
+    ApiResponse<PageableResponse<GroupReasonResponse>> findAll(int page, int size,GroupReasonResponse groupReasonResponse);
 
     GroupReasonResponse addGroupReason(GroupReasonRequest groupReasonRequest);
 

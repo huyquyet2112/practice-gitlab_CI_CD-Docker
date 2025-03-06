@@ -15,11 +15,13 @@ import org.example.quanlytuyendung.mapper.JobPositionMapper;
 import org.example.quanlytuyendung.repository.JobPositionRepository;
 import org.example.quanlytuyendung.repository.JobPositiopMapRepository;
 import org.example.quanlytuyendung.service.JobpositionService;
+import org.example.quanlytuyendung.specification.BaseSpecification;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -34,10 +36,15 @@ public class JobPositionServiceImpl  implements JobpositionService {
 
 
     @Override
-    public ApiResponse<PageableResponse<JobPositionResponse>> findAll(int page, int size) {
+    public ApiResponse<PageableResponse<JobPositionResponse>> findAll(int page, int size,JobPositionResponse jobPositionResponse) {
         Sort sort = Sort.by(Sort.Direction.DESC, "createdAt");
         Pageable pageData = PageRequest.of(page, size, sort);
-        Page<JobPositionEntity> jobPositionEntities = jobPositionRepository.findAll(pageData);
+        Map<String,Object> filters = new HashMap<>();
+        if(jobPositionResponse.getName() != null) filters.put("name", jobPositionResponse.getName());
+        if(jobPositionResponse.getCode() != null) filters.put("code", jobPositionResponse.getCode());
+        Specification<JobPositionEntity> spec = new BaseSpecification<>(filters);
+
+       var jobPositionEntities = jobPositionRepository.findAll(spec,pageData);
 
         PageableResponse<JobPositionResponse> pageableResponse = PageableResponse.<JobPositionResponse>builder()
                 .page(page)
