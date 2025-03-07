@@ -4,9 +4,10 @@ import lombok.Data;
 
 @Data
 public class PositionResponse {
-    private int id;
+    private Integer id;
     private String name;
 
-    public PositionResponse(int positionId) {
+    public PositionResponse(Integer positionId) {
+        this.id = positionId;
     }
 }

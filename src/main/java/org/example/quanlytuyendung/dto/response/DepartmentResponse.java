@@ -6,9 +6,15 @@ import lombok.Setter;
 @Getter
 @Setter
 public class DepartmentResponse {
-    private int id;
+    private Integer id;
     private String name;
 
     public DepartmentResponse(int departmentId) {
+        this.id = departmentId;
+    }
+
+    public DepartmentResponse(Integer id, String name) {
+        this.id = id;
+        this.name = name;
     }
 }

@@ -23,7 +23,7 @@ import java.time.LocalDateTime;
 public class JobPositionEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Integer id;
 
     @ManyToOne
     @JoinColumn(name = "industry_id", nullable = false)

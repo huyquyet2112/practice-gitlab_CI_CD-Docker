@@ -1,5 +1,6 @@
 package org.example.quanlytuyendung.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -11,13 +12,14 @@ import org.example.quanlytuyendung.entity.GroupReasonEntity;
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ReasonResponse {
-    private int id;
+
+    private Integer id;
     private GroupReasonResponse groupReason;
     private String name;
     private Boolean isActive;
     private String description;
 
-    public ReasonResponse(int id) {
+    public ReasonResponse(Integer id) {
         this.id = id;
     }
 }

@@ -20,9 +20,9 @@ import java.time.LocalDateTime;
 public class RecruitmentChanelEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Integer id;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JsonIgnore
     @JoinColumn(name = "candicate_source_id", nullable = false)
     private CandicateSourceEntity candicateSource;

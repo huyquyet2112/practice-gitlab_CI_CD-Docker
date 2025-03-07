@@ -13,7 +13,7 @@ import org.example.quanlytuyendung.entity.GroupReasonEntity;
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ReasonRequest {
-    private int id;
+    private Integer id;
     private GroupReasonRequest groupReason;
     private String name;
     private Boolean isActive;

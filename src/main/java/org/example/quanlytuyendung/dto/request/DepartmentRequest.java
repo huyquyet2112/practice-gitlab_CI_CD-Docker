@@ -8,6 +8,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Data
 public class DepartmentRequest {
-    private int id;
+    private Integer id;
     private String name;
 }

@@ -43,6 +43,7 @@ public class ReasonServiceImpl implements ReasonService {
         PageableResponse<ReasonResponse> response = PageableResponse.<ReasonResponse>builder()
                 .page(page)
                 .size(size)
+                .sort(sort.toString())
                 .totalPages(pageableResponse.getTotalPages())
                 .totalElements(pageableResponse.getTotalElements())
                 .numberOfElements(pageableResponse.getNumberOfElements())
