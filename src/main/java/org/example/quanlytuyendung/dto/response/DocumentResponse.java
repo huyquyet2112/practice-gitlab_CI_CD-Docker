@@ -11,21 +11,14 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class GroupQuestionResponse {
+public class DocumentResponse {
     private Integer id;
     private String name;
     private String code;
     private String description;
-
     private Boolean isActive;
 
-
-    public GroupQuestionResponse(Integer id) {
+    public DocumentResponse(Integer id) {
         this.id = id;
-    }
-
-    public GroupQuestionResponse(Integer id, String name) {
-        this.id = id;
-        this.name = name;
     }
 }

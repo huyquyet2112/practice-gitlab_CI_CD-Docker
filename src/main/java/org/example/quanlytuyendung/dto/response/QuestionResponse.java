@@ -1,31 +1,28 @@
 package org.example.quanlytuyendung.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
+import org.example.quanlytuyendung.entity.GroupQuestionEntity;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class GroupQuestionResponse {
+public class QuestionResponse {
     private Integer id;
     private String name;
-    private String code;
+    private GroupQuestionResponse groupQuestion;
     private String description;
-
     private Boolean isActive;
 
-
-    public GroupQuestionResponse(Integer id) {
+    public QuestionResponse(Integer id) {
         this.id = id;
-    }
-
-    public GroupQuestionResponse(Integer id, String name) {
-        this.id = id;
-        this.name = name;
     }
 }
