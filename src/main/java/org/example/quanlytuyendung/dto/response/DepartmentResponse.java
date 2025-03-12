@@ -12,6 +12,7 @@ public class DepartmentResponse {
     private Integer id;
     private String name;
 
+
     public DepartmentResponse(int departmentId) {
         this.id = departmentId;
     }

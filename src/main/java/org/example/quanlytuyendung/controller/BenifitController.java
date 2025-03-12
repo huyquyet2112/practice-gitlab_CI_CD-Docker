@@ -19,13 +19,12 @@ public class BenifitController {
     public ResponseEntity<ApiResponse<PageableResponse<BenifitResponse>>> getBenifit(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
-            @RequestParam(required = false) String name,
-            @RequestParam(required = false) String code
+            @RequestParam(required = false) String search,
+            @RequestParam(defaultValue = "createdAt:DESC") String sort
+
     ) {
-        BenifitResponse benifitResponse = new BenifitResponse();
-        benifitResponse.setCode(code);
-        benifitResponse.setName(name);
-        ApiResponse<PageableResponse<BenifitResponse>> apiResponse = benifitService.getBenifit(page,size,benifitResponse);
+
+        ApiResponse<PageableResponse<BenifitResponse>> apiResponse = benifitService.getBenifit(page,size,search,sort);
         return ResponseEntity.ok(apiResponse);
     }
     @PostMapping

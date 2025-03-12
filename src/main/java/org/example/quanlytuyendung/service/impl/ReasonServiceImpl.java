@@ -31,19 +31,22 @@ public class ReasonServiceImpl implements ReasonService {
     private final ReasonMapper reasonMapper;
 
     @Override
-    public ApiResponse<PageableResponse<ReasonResponse>> findAllReason(int page, int size, ReasonResponse reasonResponse) {
-        Sort sort = Sort.by(Sort.Direction.DESC, "createdAt");
-        Pageable pageable = PageRequest.of(page, size, sort);
+    public ApiResponse<PageableResponse<ReasonResponse>> findAllReason(int page, int size,String search ,String sort) {
+        String [] sortParam = sort.split(":");
+        String sortField = sortParam[0];
+        Sort.Direction sortDirection = sortParam.length > 1 && sortParam[1].equalsIgnoreCase("ASC") ? Sort.Direction.DESC : Sort.Direction.ASC;
+        Sort orders = Sort.by(sortDirection, sortField);
+        Pageable pageable = PageRequest.of(page, size, orders);
         Map<String,Object> filter = new HashMap<>();
-        if (reasonResponse.getName() != null) {
-            filter.put("name", reasonResponse.getName());
-        }
+      if(search != null && !search.isEmpty()){
+          filter.put("name",search);
+      }
         Specification<ReasonEntity> specification = new BaseSpecification<>(filter);
         var pageableResponse = reasonRepository.findAll(specification,pageable);
         PageableResponse<ReasonResponse> response = PageableResponse.<ReasonResponse>builder()
                 .page(page)
                 .size(size)
-                .sort(sort.toString())
+                .sort(orders.toString())
                 .totalPages(pageableResponse.getTotalPages())
                 .totalElements(pageableResponse.getTotalElements())
                 .numberOfElements(pageableResponse.getNumberOfElements())
@@ -53,7 +56,7 @@ public class ReasonServiceImpl implements ReasonService {
     }
 
     @Override
-    public ReasonResponse addReason(ReasonRequest reasonRequest) {
+    public ApiResponse<ReasonResponse> addReason(ReasonRequest reasonRequest) {
         if (reasonRequest.getGroupReason() == null || reasonRequest.getGroupReason().getId() == null) {
             throw new RuntimeException("GroupReason ID không được để trống");
         }
@@ -63,11 +66,11 @@ public class ReasonServiceImpl implements ReasonService {
         reasonEntity.setGroupReason(groupReasonEntity);
 
         reasonEntity = reasonRepository.save(reasonEntity);
-        return new ReasonResponse(reasonEntity.getId());
+        return new ApiResponse<>(new ReasonResponse(reasonEntity.getId())) ;
     }
 
     @Override
-    public ReasonResponse updateReason(ReasonRequest reasonRequest) {
+    public ApiResponse<ReasonResponse> updateReason(ReasonRequest reasonRequest) {
         ReasonEntity reasonEntity = reasonRepository.findById(reasonRequest.getId()).orElseThrow(() -> new RuntimeException("Job Position not found!"));
         reasonEntity.setName(reasonRequest.getName());
         reasonEntity.setIsActive(reasonRequest.getIsActive());
@@ -75,13 +78,13 @@ public class ReasonServiceImpl implements ReasonService {
                 .orElseThrow(() -> new RuntimeException("GroupReason không tồn tại"));
         reasonEntity.setGroupReason(groupReasonEntity);
         reasonRepository.save(reasonEntity);
-        return new ReasonResponse(reasonEntity.getId());
+        return new ApiResponse<>(new ReasonResponse(reasonEntity.getId())) ;
     }
 
     @Override
-    public ReasonResponse findReason(Integer id) {
+    public ApiResponse<ReasonResponse> findReason(Integer id) {
         ReasonEntity reasonEntity = reasonRepository.findById(id).orElseThrow(() -> new RuntimeException("Reason not found!"));
-        return reasonMapper.toResponse(reasonEntity);
+        return new ApiResponse<>(reasonMapper.toResponse(reasonEntity)) ;
     }
 
     @Override

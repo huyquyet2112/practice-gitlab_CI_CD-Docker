@@ -22,25 +22,23 @@ public class IndustryController {
     public ResponseEntity<ApiResponse <PageableResponse<IndustryResponse>>> getAllIndustries(
             @RequestParam(defaultValue = "0" , required = false) int page,
             @RequestParam(defaultValue = "10", required = false) int size,
-            @RequestParam(value = "name",required = false)String name,
-            @RequestParam (value = "code",required = false)String code
+            @RequestParam(required = false)String search,
+            @RequestParam (defaultValue = "createdAt:DESC")String sort
     ) {
-        IndustryResponse industryResponse = new IndustryResponse();
-        industryResponse.setName(name);
-        industryResponse.setCode(code);
-       ApiResponse<PageableResponse<IndustryResponse>> industryPage = industryService.findAll(page, size,industryResponse);
+
+       ApiResponse<PageableResponse<IndustryResponse>> industryPage = industryService.findAll(page, size,search,sort);
         return   new ResponseEntity<>(industryPage, HttpStatus.OK);
     }
 
 
     @PostMapping()
-    public ResponseEntity<IndustryResponse> add(@RequestBody IndustryRequest industryRequest) {
-        IndustryResponse industryResponse = industryService.save(industryRequest);
+    public ResponseEntity<ApiResponse <IndustryResponse>> add(@RequestBody IndustryRequest industryRequest) {
+       ApiResponse <IndustryResponse> industryResponse = industryService.save(industryRequest);
         return ResponseEntity.ok(industryResponse);
     }
     @PutMapping()
-    public ResponseEntity<IndustryResponse> update(@RequestBody IndustryRequest industryRequest) {
-        IndustryResponse industryResponse = industryService.update(industryRequest);
+    public ResponseEntity<ApiResponse <IndustryResponse>> update(@RequestBody IndustryRequest industryRequest) {
+        ApiResponse <IndustryResponse> industryResponse = industryService.update(industryRequest);
         return ResponseEntity.ok(industryResponse);
     }
     @GetMapping()

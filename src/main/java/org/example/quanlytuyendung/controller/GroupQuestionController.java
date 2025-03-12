@@ -20,13 +20,11 @@ public class GroupQuestionController {
     public ResponseEntity<ApiResponse<PageableResponse<GroupQuestionResponse>>> getGroupQuestions(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
-            @RequestParam(required = false) String name,
-            @RequestParam(required = false) String code
+            @RequestParam(required = false) String search,
+            @RequestParam(defaultValue = "createdAt:DESC") String sort
     ){
-        GroupQuestionResponse groupQuestionResponse = new GroupQuestionResponse();
-        groupQuestionResponse.setCode(code);
-        groupQuestionResponse.setName(name);
-        ApiResponse<PageableResponse<GroupQuestionResponse>> groupQuestionResponsePageableResponse = groupQuestionService.getGroupQuestions(page,size,groupQuestionResponse);
+
+        ApiResponse<PageableResponse<GroupQuestionResponse>> groupQuestionResponsePageableResponse = groupQuestionService.getGroupQuestions(page,size,search,sort);
         return new ResponseEntity<>(groupQuestionResponsePageableResponse, HttpStatus.OK);
     }
     @PostMapping

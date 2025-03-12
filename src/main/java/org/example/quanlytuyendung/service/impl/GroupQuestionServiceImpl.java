@@ -27,23 +27,25 @@ public class GroupQuestionServiceImpl implements GroupQuestionService {
     private final GroupQuestionMapper groupQuestionMapper;
 
     @Override
-    public ApiResponse<PageableResponse<GroupQuestionResponse>> getGroupQuestions(int page, int size, GroupQuestionResponse groupQuestionResponse) {
-       Sort sort = Sort.by(Sort.Direction.DESC, "createdAt");
-        Pageable pageable = PageRequest.of(page, size, sort);
+    public ApiResponse<PageableResponse<GroupQuestionResponse>> getGroupQuestions(int page, int size, String search,String sort) {
+       String [] sortParam = sort.split(":");
+       String sortField = sortParam[0];
+       Sort.Direction  sortDirection = sortParam.length>1 && sortParam[1].equalsIgnoreCase("ASC") ? Sort.Direction.ASC : Sort.Direction.DESC;
+
+        Sort orders = Sort.by(sortDirection, sortField);
+        Pageable pageable = PageRequest.of(page, size, orders);
         Map<String,Object> filter = new HashMap<>();
-        if(groupQuestionResponse.getId()!=null){
-            filter.put("code",groupQuestionResponse.getCode());
-        }
-        if(groupQuestionResponse.getName()!=null){
-            filter.put("name",groupQuestionResponse.getName());
-        }
+       if(search != null && !search.isEmpty()){
+           filter.put("name", search);
+           filter.put("code", search);
+       }
         Specification<GroupQuestionEntity> spec = new BaseSpecification<>(filter);
         var result = groupQuestionRepository.findAll(spec,pageable);
 
         PageableResponse<GroupQuestionResponse> pageableResponse = PageableResponse.<GroupQuestionResponse>builder()
                 .page(page)
                 .size(size)
-                .sort(sort.toString())
+                .sort(orders.toString())
                 .totalPages(result.getTotalPages())
                 .totalElements(result.getTotalElements())
                 .numberOfElements(result.getNumberOfElements())

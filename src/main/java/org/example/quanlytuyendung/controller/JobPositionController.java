@@ -23,21 +23,19 @@ public class JobPositionController {
     public ResponseEntity<ApiResponse<PageableResponse<JobPositionResponse>>> getAllJobPosition(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
-            @RequestParam(required = false) String name,
-            @RequestParam(required = false) String code) {
+            @RequestParam(required = false) String search,
+            @RequestParam(defaultValue = "createdAt:DESC") String sort) {
 
-        JobPositionResponse jobPositionResponse = new JobPositionResponse();
-        jobPositionResponse.setName(name);
-        jobPositionResponse.setCode(code);
-        ApiResponse<PageableResponse<JobPositionResponse>> response = jobpositionService.findAll(page, size,jobPositionResponse);
+
+        ApiResponse<PageableResponse<JobPositionResponse>> response = jobpositionService.findAll(page, size,search,sort);
 
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
     @PostMapping
     public ResponseEntity<ApiResponse<JobPositionResponse>> createJobPosition(@RequestBody JobPositionRequest request) {
-        JobPositionResponse jobPositionResponse = jobpositionService.addJobPosition(request);
-        ApiResponse<JobPositionResponse> response = new ApiResponse<>(jobPositionResponse);
-        return ResponseEntity.ok(response);
+       ApiResponse <JobPositionResponse> jobPositionResponse = jobpositionService.addJobPosition(request);
+
+        return ResponseEntity.ok(jobPositionResponse);
     }
     @PutMapping()
     public ResponseEntity<ApiResponse<JobPositionResponse>> updateJobPosition(@RequestBody JobPositionRequest request) {

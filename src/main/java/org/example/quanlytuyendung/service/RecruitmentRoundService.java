@@ -7,9 +7,9 @@ import org.example.quanlytuyendung.dto.response.RecruitmentRoundResponse;
 import org.example.quanlytuyendung.entity.RecruitmentRoundEntity;
 
 public interface RecruitmentRoundService {
-    ApiResponse<PageableResponse<RecruitmentRoundResponse>> findRound(int page, int size, RecruitmentRoundResponse recruitmentRoundResponse);
+    ApiResponse<PageableResponse<RecruitmentRoundResponse>> findRound(int page, int size,String search,String sort);
 
-    RecruitmentRoundResponse addRecruitmentRound(RecruitmentRoundRequest recruitmentRoundRequest);
+    ApiResponse<RecruitmentRoundResponse> addRecruitmentRound(RecruitmentRoundRequest recruitmentRoundRequest);
 
     ApiResponse<RecruitmentRoundResponse> updateRound(RecruitmentRoundRequest recruitmentRoundRequest);
 

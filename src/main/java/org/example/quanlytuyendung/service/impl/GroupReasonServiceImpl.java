@@ -31,18 +31,23 @@ public class GroupReasonServiceImpl implements GroupReasonService {
 
 
     @Override
-    public ApiResponse<PageableResponse<GroupReasonResponse>> findAll(int page, int size, GroupReasonResponse groupReasonResponse) {
-        Sort sort = Sort.by(Sort.Direction.DESC, "id");
-        Pageable pageable = PageRequest.of(page, size, sort);
+    public ApiResponse<PageableResponse<GroupReasonResponse>> findAll(int page, int size,String search,String sort) {
+        String [] sortParam = sort.split(":");
+        String sortField = sortParam[0];
+        Sort.Direction sortDirection = sortParam.length>1 && sortParam[1].equalsIgnoreCase("ASC") ? Sort.Direction.ASC : Sort.Direction.DESC;
+        Sort orders = Sort.by(sortDirection, sortField);
+        Pageable pageable = PageRequest.of(page, size, orders);
         Map<String,Object> filters = new HashMap<>();
-        if(groupReasonResponse.getCode() != null) filters.put("code", groupReasonResponse.getCode());
-        if(groupReasonResponse.getName() != null) filters.put("name", groupReasonResponse.getName());
+       if(search != null && !search.isEmpty()){
+           filters.put("name", search);
+           filters.put("code", search);
+       }
         Specification<GroupReasonEntity> spec = new BaseSpecification<>(filters) ;
         var pageData = groupReasonRepository.findAll(spec,pageable);
         PageableResponse<GroupReasonResponse> pageableResponse = PageableResponse.<GroupReasonResponse>builder()
                 .page(page)
                 .size(size)
-                .sort(sort.toString())
+                .sort(orders.toString())
                 .totalPages(pageData.getTotalPages())
                 .totalElements(pageData.getTotalElements())
                 .totalElements(pageData.getTotalElements())
@@ -53,24 +58,24 @@ public class GroupReasonServiceImpl implements GroupReasonService {
     }
 
     @Override
-    public GroupReasonResponse addGroupReason(GroupReasonRequest groupReasonRequest) {
+    public ApiResponse <GroupReasonResponse> addGroupReason(GroupReasonRequest groupReasonRequest) {
         if (groupReasonRepository.existsByName(groupReasonRequest.getName())) {
             throw new IllegalArgumentException("Try again! Name already exists.");
         }
         GroupReasonEntity groupReasonEntity = groupReasonMapper.toEntity(groupReasonRequest);
         groupReasonRepository.save(groupReasonEntity);
-        return new GroupReasonResponse(groupReasonEntity.getId());
+        return new ApiResponse<>(new GroupReasonResponse(groupReasonEntity.getId())) ;
     }
 
     @Override
-    public GroupReasonResponse updateGroupReason(GroupReasonRequest groupReasonRequest) {
+    public ApiResponse <GroupReasonResponse> updateGroupReason(GroupReasonRequest groupReasonRequest) {
         GroupReasonEntity grouperReasonEntity = groupReasonRepository.findById(groupReasonRequest.getId()).orElseThrow(() -> new RuntimeException("Group Reason not found!")) ;
         grouperReasonEntity.setName(groupReasonRequest.getName());
         grouperReasonEntity.setCode(groupReasonRequest.getCode());
         grouperReasonEntity.setDescription(groupReasonRequest.getDescription());
         grouperReasonEntity.setIsActive(groupReasonRequest.getIsActive());
         groupReasonRepository.save(grouperReasonEntity);
-        return new GroupReasonResponse(grouperReasonEntity.getId());
+        return new ApiResponse<>(new GroupReasonResponse(grouperReasonEntity.getId())) ;
     }
 
     @Override

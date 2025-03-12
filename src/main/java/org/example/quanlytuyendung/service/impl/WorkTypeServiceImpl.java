@@ -27,22 +27,23 @@ public class WorkTypeServiceImpl implements WorkTypeService {
     private final WorkTypeMapper workTypeMapper;
 
     @Override
-    public ApiResponse<PageableResponse<WorkTypeResponse>> getWorkTypeList(int page, int size, WorkTypeResponse workTypeResponse) {
-        Sort sort = Sort.by(Sort.Direction.ASC, "createdAt");
-        Pageable pageable = PageRequest.of(page, size, sort);
+    public ApiResponse<PageableResponse<WorkTypeResponse>> getWorkTypeList(int page, int size, String search, String sort ) {
+        String [] sortParam = sort.split(":");
+        String sortField = sortParam[0];
+        Sort.Direction sortDirection = sortParam.length > 1 && sortParam[1].equalsIgnoreCase("ASC") ? Sort.Direction.DESC : Sort.Direction.ASC;
+        Sort orders = Sort.by(sortDirection, sortField);
+        Pageable pageable = PageRequest.of(page, size, orders);
         Map<String,Object> filters = new HashMap<>();
-        if(workTypeResponse.getName()!=null){
-            filters.put("name",workTypeResponse.getName());
-        }
-        if(workTypeResponse.getCode()!=null){
-            filters.put("code",workTypeResponse.getCode());
-        }
+     if (search != null && !search.isEmpty()) {
+         filters.put("name", search);
+         filters.put("code", search);
+     }
         Specification<WorkTypeEntity> specification = new BaseSpecification<>(filters);
         var result = workTypeRepository.findAll(specification,pageable);
         PageableResponse<WorkTypeResponse> pageableResponse = PageableResponse.<WorkTypeResponse>builder()
                 .page(page)
                 .size(size)
-                .sort(sort.toString())
+                .sort(orders.toString())
                 .totalPages(result.getTotalPages())
                 .totalElements(result.getTotalElements())
                 .numberOfElements(result.getNumberOfElements())

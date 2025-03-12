@@ -7,11 +7,11 @@ import org.example.quanlytuyendung.dto.response.PageableResponse;
 import org.example.quanlytuyendung.entity.LevelEntity;
 
 public interface LevelService {
-    ApiResponse<PageableResponse<LevelResponse>> getLevels(int page, int size, LevelResponse levelResponse);
+    ApiResponse<PageableResponse<LevelResponse>> getLevels(int page, int size, String search, String sort);
 
-    LevelResponse addLevel(LevelRequest levelRequest);
+    ApiResponse<LevelResponse> addLevel(LevelRequest levelRequest);
 
-    LevelResponse updateLevel(LevelRequest levelRequest);
+    ApiResponse<LevelResponse> updateLevel(LevelRequest levelRequest);
 
     ApiResponse<LevelResponse> getLevel(int id);
 

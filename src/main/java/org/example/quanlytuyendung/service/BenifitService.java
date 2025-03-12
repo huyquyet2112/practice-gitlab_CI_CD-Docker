@@ -7,7 +7,7 @@ import org.example.quanlytuyendung.dto.response.PageableResponse;
 import org.example.quanlytuyendung.entity.BenifitEntity;
 
 public interface BenifitService {
-    ApiResponse<PageableResponse<BenifitResponse>> getBenifit(int page, int size, BenifitResponse benifitResponse);
+    ApiResponse<PageableResponse<BenifitResponse>> getBenifit(int page, int size, String search,String sort);
 
     ApiResponse<BenifitResponse> postBenifit(BenifitRequest benifitRequest);
 

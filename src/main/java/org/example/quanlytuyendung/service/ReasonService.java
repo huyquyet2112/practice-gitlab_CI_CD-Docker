@@ -7,13 +7,13 @@ import org.example.quanlytuyendung.dto.response.ReasonResponse;
 import org.example.quanlytuyendung.entity.ReasonEntity;
 
 public interface ReasonService {
-    ApiResponse<PageableResponse<ReasonResponse>> findAllReason(int page, int size, ReasonResponse reasonResponse);
+    ApiResponse<PageableResponse<ReasonResponse>> findAllReason(int page, int size,String search,String sort);
 
-    ReasonResponse addReason(ReasonRequest reasonRequest);
+    ApiResponse<ReasonResponse> addReason(ReasonRequest reasonRequest);
 
-    ReasonResponse updateReason(ReasonRequest reasonRequest);
+    ApiResponse<ReasonResponse> updateReason(ReasonRequest reasonRequest);
 
-    ReasonResponse findReason(Integer id);
+    ApiResponse<ReasonResponse> findReason(Integer id);
 
     ReasonEntity deleteReason(Integer id);
 }

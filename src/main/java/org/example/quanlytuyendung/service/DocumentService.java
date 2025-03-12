@@ -7,7 +7,7 @@ import org.example.quanlytuyendung.dto.response.PageableResponse;
 import org.example.quanlytuyendung.entity.DocumentEntity;
 
 public interface DocumentService {
-    ApiResponse<PageableResponse<DocumentResponse>> getDocument(int page, int size, DocumentResponse documentResponse);
+    ApiResponse<PageableResponse<DocumentResponse>> getDocument(int page, int size,String search,String sort);
 
     ApiResponse<DocumentResponse> createDocument(DocumentRequest documentRequest);
 

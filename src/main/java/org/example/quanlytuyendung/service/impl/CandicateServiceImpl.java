@@ -30,17 +30,19 @@ public class CandicateServiceImpl implements CandicateSourceService {
     private final CandicateSourceRepository candicateSourceRepository;
     private final CandicateSourceMapper candicateSourceMapper;
     @Override
-    public ApiResponse<PageableResponse<CandicateSourceResponse>> findAll(int page, int size, CandicateSourceResponse candicateSourceResponse) {
-        Sort sort = Sort.by(Sort.Direction.DESC, "createdAt");
-        Pageable pageable = PageRequest.of(page, size, sort);
+    public ApiResponse<PageableResponse<CandicateSourceResponse>> findAll(int page, int size,String search,String sort ) {
+       String [] sortParam = sort.split(":");
+       String  sortField = sortParam[0];
+       Sort.Direction sortDirection = sortParam.length>1 && sortParam[1].equalsIgnoreCase("ASC") ? Sort.Direction.ASC : Sort.Direction.DESC;
+        Sort orders = Sort.by(sortDirection, sortField);
+        Pageable pageable = PageRequest.of(page, size, orders);
 
-        // Tạo filter từ dữ liệu đầu vào
+
         Map<String, Object> filter = new HashMap<>();
-        if (candicateSourceResponse.getName() != null) {
-            filter.put("name", candicateSourceResponse.getName());
-        }
-        if (candicateSourceResponse.getCode() != null) {
-            filter.put("code", candicateSourceResponse.getCode());
+
+        if (search != null && !search.trim().isEmpty()){
+            filter.put("code", search);
+            filter.put("name", search);
         }
 
         Specification<CandicateSourceEntity> spec = new BaseSpecification<>(filter);
@@ -50,7 +52,7 @@ public class CandicateServiceImpl implements CandicateSourceService {
         PageableResponse<CandicateSourceResponse> pageableResponse = PageableResponse.<CandicateSourceResponse>builder()
                 .page(page)
                 .size(size)
-                .sort(sort.toString())
+                .sort(orders.toString())
                 .totalPages(pageData.getTotalPages())
                 .totalElements(pageData.getTotalElements())
                 .numberOfElements(pageData.getNumberOfElements())
@@ -61,21 +63,21 @@ public class CandicateServiceImpl implements CandicateSourceService {
     }
 
     @Override
-    public CandicateSourceResponse addCandicateSource(CandicateSourceRequest candicateSourceRequest) {
+    public ApiResponse <CandicateSourceResponse> addCandicateSource(CandicateSourceRequest candicateSourceRequest) {
         CandicateSourceEntity candicateSourceEntity = candicateSourceMapper.toEntity(candicateSourceRequest);
         candicateSourceRepository.save(candicateSourceEntity);
-        return new CandicateSourceResponse(candicateSourceEntity.getId());
+        return new ApiResponse<>(new CandicateSourceResponse(candicateSourceEntity.getId()));
     }
 
     @Override
-    public CandicateSourceResponse updateCandicateSource(CandicateSourceRequest candicateSourceRequest) {
+    public ApiResponse <CandicateSourceResponse> updateCandicateSource(CandicateSourceRequest candicateSourceRequest) {
         CandicateSourceEntity candicateSourceEntity = candicateSourceRepository.findById(candicateSourceRequest.getId()).orElseThrow(() -> new RuntimeException("Group Reason not found!"));
         candicateSourceEntity.setName(candicateSourceRequest.getName());
         candicateSourceEntity.setCode(candicateSourceRequest.getCode());
         candicateSourceEntity.setIsActive(candicateSourceRequest.getIsActive());
         candicateSourceEntity.setDescription(candicateSourceRequest.getDescription());
         candicateSourceRepository.save(candicateSourceEntity);
-        return new CandicateSourceResponse(candicateSourceEntity.getId());
+        return new ApiResponse<>(new CandicateSourceResponse(candicateSourceEntity.getId()));
     }
 
     @Override

@@ -5,14 +5,12 @@ import org.example.quanlytuyendung.dto.response.LineResponse;
 import org.example.quanlytuyendung.dto.response.PositionResponse;
 import org.example.quanlytuyendung.entity.JobPositionEntityMap;
 import org.mapstruct.*;
-import java.util.Collections;
-import java.util.List;
+
+import java.util.*;
 
 @Mapper(componentModel = "spring")
 public interface JobPositionMapMapper {
-    @Mapping(target = "department", source = "departmentId", qualifiedByName = "mapDepartment")
-    @Mapping(target = "positions", source = "positionId", qualifiedByName = "mapPositions")
-    LineResponse toResponse(JobPositionEntityMap jobPositionEntityMap);
+
 
     @Named("mapDepartment")
     static DepartmentResponse mapDepartment(int departmentId) {
@@ -22,5 +20,21 @@ public interface JobPositionMapMapper {
     @Named("mapPositions")
     static List<PositionResponse> mapPositions(int positionId) {
         return Collections.singletonList(new PositionResponse(positionId));
+    }
+    @Named("toLineResponses")
+    default List<LineResponse> toLineResponses(List<JobPositionEntityMap> jobPositionEntityMaps) {
+        Map<Integer, LineResponse> departmentMap = new HashMap<>();
+
+        for (JobPositionEntityMap entityMap : jobPositionEntityMaps) {
+            Integer departmentId = entityMap.getDepartmentId();
+            Integer positionId = entityMap.getPositionId();
+
+            departmentMap.putIfAbsent(departmentId, new LineResponse(new DepartmentResponse(departmentId, null), new ArrayList<>()));
+
+
+            departmentMap.get(departmentId).getPositions().add(new PositionResponse(positionId));
+        }
+
+        return new ArrayList<>(departmentMap.values());
     }
 }

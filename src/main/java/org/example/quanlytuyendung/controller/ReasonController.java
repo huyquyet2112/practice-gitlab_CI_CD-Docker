@@ -19,26 +19,26 @@ public class ReasonController {
     @GetMapping("/list")
     public ResponseEntity<ApiResponse<PageableResponse<ReasonResponse>>> getAllReasons(@RequestParam(defaultValue = "0") int page,
                                                                                        @RequestParam(defaultValue = "10") int size,
-                                                                                       @RequestParam(required = false) String name){
-      ReasonResponse reasonResponse = new ReasonResponse();
-      reasonResponse.setName(name);
-      ApiResponse<PageableResponse<ReasonResponse>> apiResponse = reasonService.findAllReason(page,size,reasonResponse);
+                                                                                       @RequestParam(required = false) String search,
+                                                                                       @RequestParam(defaultValue = "createdAt:DESC") String sort){
+
+      ApiResponse<PageableResponse<ReasonResponse>> apiResponse = reasonService.findAllReason(page,size,search,sort);
       return ResponseEntity.ok(apiResponse);
 
     }
     @PostMapping
-    public ResponseEntity<ReasonResponse> addReason(@RequestBody ReasonRequest reasonRequest) {
-        ReasonResponse reasonResponse = reasonService.addReason(reasonRequest);
+    public ResponseEntity<ApiResponse<ReasonResponse>> addReason(@RequestBody ReasonRequest reasonRequest) {
+       ApiResponse <ReasonResponse> reasonResponse = reasonService.addReason(reasonRequest);
         return ResponseEntity.ok(reasonResponse);
     }
     @PutMapping
-    public ResponseEntity<ReasonResponse> updateReason(@RequestBody ReasonRequest reasonRequest) {
-        ReasonResponse reasonResponse = reasonService.updateReason(reasonRequest);
+    public ResponseEntity<ApiResponse<ReasonResponse>> updateReason(@RequestBody ReasonRequest reasonRequest) {
+        ApiResponse <ReasonResponse> reasonResponse = reasonService.updateReason(reasonRequest);
         return ResponseEntity.ok(reasonResponse);
     }
     @GetMapping
-    public ResponseEntity<ReasonResponse> getReasonById(@RequestParam Integer id) {
-        ReasonResponse reasonResponse = reasonService.findReason(id);
+    public ResponseEntity<ApiResponse<ReasonResponse>> getReasonById(@RequestParam Integer id) {
+        ApiResponse <ReasonResponse> reasonResponse = reasonService.findReason(id);
         return ResponseEntity.ok(reasonResponse);
     }
     @DeleteMapping

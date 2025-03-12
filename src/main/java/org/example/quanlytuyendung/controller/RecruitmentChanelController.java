@@ -20,31 +20,29 @@ public class RecruitmentChanelController {
     public ResponseEntity<ApiResponse<PageableResponse<RecruitmentChanelResponse>>> getRecruitmentChanel(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
-            @RequestParam(required = false) String name
+            @RequestParam(required = false) String search,
+            @RequestParam(defaultValue = "createdAt:DESC") String sort
     ) {
-        RecruitmentChanelResponse response = new RecruitmentChanelResponse();
-        if (name != null && !name.trim().isEmpty()) {
-            response.setName(name);
-        }
+
         ApiResponse<PageableResponse<RecruitmentChanelResponse>> apiResponse =
-                recruitmentService.findAllChanel(page, size, response);
+                recruitmentService.findAllChanel(page, size, search,sort);
         return ResponseEntity.ok(apiResponse);
     }
 
     @PostMapping
-    public ResponseEntity<RecruitmentChanelResponse> addRecruitmentChanel(
+    public ResponseEntity<ApiResponse<RecruitmentChanelResponse>> addRecruitmentChanel(
             @RequestBody RecruitmentChanelRequest request) {
-        RecruitmentChanelResponse response = recruitmentService.addRecruitmentChanel(request);
+       ApiResponse <RecruitmentChanelResponse> response = recruitmentService.addRecruitmentChanel(request);
         return ResponseEntity.ok(response);
     }
     @GetMapping
-    public ResponseEntity<RecruitmentChanelResponse> getRecruitmentChanel(@RequestParam int id) {
-        RecruitmentChanelResponse response = recruitmentService.findRecruimentChanel(id);
+    public ResponseEntity<ApiResponse<RecruitmentChanelResponse>> getRecruitmentChanel(@RequestParam int id) {
+        ApiResponse <RecruitmentChanelResponse>  response = recruitmentService.findRecruimentChanel(id);
         return ResponseEntity.ok(response);
     }
     @PutMapping
-    public ResponseEntity<RecruitmentChanelResponse> updateRecruitmentChanel(@RequestBody RecruitmentChanelRequest request) {
-        RecruitmentChanelResponse response = recruitmentService.updateRecruitmentChanel(request);
+    public ResponseEntity<ApiResponse<RecruitmentChanelResponse>> updateRecruitmentChanel(@RequestBody RecruitmentChanelRequest request) {
+        ApiResponse <RecruitmentChanelResponse>  response = recruitmentService.updateRecruitmentChanel(request);
         return ResponseEntity.ok(response);
     }
     @DeleteMapping

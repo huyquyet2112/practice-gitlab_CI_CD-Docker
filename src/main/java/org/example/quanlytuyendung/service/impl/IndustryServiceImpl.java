@@ -32,14 +32,16 @@ public class IndustryServiceImpl implements IndustryService {
 
 
     @Override
-    public ApiResponse<PageableResponse<IndustryResponse>> findAll(int page, int size, IndustryResponse industryResponse) {
-
-        Sort sort = Sort.by(Sort.Direction.DESC, "createdAt");
-        Pageable pageable = PageRequest.of(page, size, sort);
+    public ApiResponse<PageableResponse<IndustryResponse>> findAll(int page, int size,String search,String sort) {
+        String [] sortParam = sort.split(":");
+        String sortField = sortParam[0];
+        Sort.Direction sortDirection = sortParam.length > 1 && sortParam[1].equalsIgnoreCase("ASC") ? Sort.Direction.DESC : Sort.Direction.ASC;
+        Sort orders = Sort.by(sortDirection, sortField);
+        Pageable pageable = PageRequest.of(page, size, orders);
         Map<String, Object> filters = new HashMap<>();
-        if (industryResponse != null) {
-            if (industryResponse.getName() != null) filters.put("name", industryResponse.getName());
-            if (industryResponse.getCode() != null) filters.put("code", industryResponse.getCode());
+        if(search != null && !search.isEmpty()){
+            filters.put("name", search);
+            filters.put("code", search);
         }
         Specification<IndustryEntity> spec = new BaseSpecification<>(filters);
         var pageData = industryRepo.findAll(spec, pageable);
@@ -47,7 +49,7 @@ public class IndustryServiceImpl implements IndustryService {
         PageableResponse<IndustryResponse> pageableResponse = PageableResponse.<IndustryResponse>builder()
                 .page(page)
                 .size(size)
-                .sort(sort.toString())
+                .sort(orders.toString())
                 .totalPages(pageData.getTotalPages())
                 .totalElements(pageData.getTotalElements())
                 .numberOfElements(pageData.getNumberOfElements())
@@ -61,17 +63,17 @@ public class IndustryServiceImpl implements IndustryService {
 
 
     @Override
-    public IndustryResponse save(IndustryRequest industryRequest) {
+    public ApiResponse <IndustryResponse> save(IndustryRequest industryRequest) {
         if (industryRepo.existsByCode(industryRequest.getCode())) {
             throw new IllegalArgumentException("Try again! Code already exists.");
         }
         IndustryEntity industryEntity = industryMapper.toModel(industryRequest);
         industryEntity = industryRepo.save(industryEntity);
-        return new IndustryResponse(industryEntity.getId()) ;
+        return new ApiResponse<>(new  IndustryResponse(industryEntity.getId())) ;
     }
 
     @Override
-    public IndustryResponse update(IndustryRequest industryRequest) {
+    public ApiResponse <IndustryResponse> update(IndustryRequest industryRequest) {
         IndustryEntity industryEntity = industryRepo.findById(industryRequest.getId())
                 .orElseThrow(() -> new RuntimeException("Industry with ID " + industryRequest.getId() + " doesn't exist."));
 
@@ -88,9 +90,8 @@ public class IndustryServiceImpl implements IndustryService {
         if (!industryEntity.getCode().equals(industryRequest.getCode())) {
             industryEntity.setCode(industryRequest.getCode());
         }
-
-        IndustryEntity updatedEntity = industryRepo.save(industryEntity);
-        return new IndustryResponse(updatedEntity.getId()) ;
+         industryRepo.save(industryEntity);
+        return new ApiResponse<>(new  IndustryResponse(industryEntity.getId())) ;
     }
 
     @Override

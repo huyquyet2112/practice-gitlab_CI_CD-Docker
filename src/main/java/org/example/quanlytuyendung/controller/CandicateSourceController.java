@@ -20,24 +20,22 @@ public class CandicateSourceController {
     public ResponseEntity<ApiResponse<PageableResponse<CandicateSourceResponse>>> getCandicateSourceList(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
-            @RequestParam(required = false) String name,
-            @RequestParam(required = false) String code
+            @RequestParam(required = false) String search,
+            @RequestParam(defaultValue = "createdAt:DESC") String sort
     ){
 
-    CandicateSourceResponse candicateSourceResponse = new CandicateSourceResponse();
-    candicateSourceResponse.setName(name);
-    candicateSourceResponse.setCode(code);
-    ApiResponse<PageableResponse<CandicateSourceResponse>> apiResponse = candicateSourceService.findAll(page,size,candicateSourceResponse);
+
+    ApiResponse<PageableResponse<CandicateSourceResponse>> apiResponse = candicateSourceService.findAll(page,size,search,sort);
     return ResponseEntity.ok(apiResponse);
 }
     @PostMapping
-    public ResponseEntity<CandicateSourceResponse> createCandicateSource(@RequestBody CandicateSourceRequest candicateSourceRequest){
-        CandicateSourceResponse candicateSourceResponse = candicateSourceService.addCandicateSource(candicateSourceRequest);
+    public ResponseEntity<ApiResponse<CandicateSourceResponse>> createCandicateSource(@RequestBody CandicateSourceRequest candicateSourceRequest){
+       ApiResponse<CandicateSourceResponse> candicateSourceResponse = candicateSourceService.addCandicateSource(candicateSourceRequest);
         return ResponseEntity.ok(candicateSourceResponse);
     }
     @PutMapping
-    public ResponseEntity<CandicateSourceResponse> updateCandicateSource(@RequestBody CandicateSourceRequest candicateSourceRequest){
-        CandicateSourceResponse candicateSourceResponse = candicateSourceService.updateCandicateSource(candicateSourceRequest);
+    public ResponseEntity<ApiResponse<CandicateSourceResponse>> updateCandicateSource(@RequestBody CandicateSourceRequest candicateSourceRequest){
+     ApiResponse  <CandicateSourceResponse> candicateSourceResponse = candicateSourceService.updateCandicateSource(candicateSourceRequest);
         return ResponseEntity.ok(candicateSourceResponse);
     }
     @GetMapping

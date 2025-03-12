@@ -19,13 +19,10 @@ public class WorkTypeController {
     public ResponseEntity<ApiResponse<PageableResponse<WorkTypeResponse>>> getWorkTypeList(
             @RequestParam(defaultValue = "0" , required = false) int page,
             @RequestParam(defaultValue = "10", required = false) int size,
-            @RequestParam(value = "name",required = false)String name,
-            @RequestParam (value = "code",required = false)String code
+            @RequestParam(required = false)String search,
+            @RequestParam (defaultValue = "createdAt:DESC")String sort
     ){
-        WorkTypeResponse workTypeResponse = new WorkTypeResponse();
-        workTypeResponse.setName(name);
-        workTypeResponse.setCode(code);
-        ApiResponse<PageableResponse<WorkTypeResponse>> apiResponse = workTypeService.getWorkTypeList(page,size,workTypeResponse);
+        ApiResponse<PageableResponse<WorkTypeResponse>> apiResponse = workTypeService.getWorkTypeList(page,size,search,sort);
         return ResponseEntity.ok(apiResponse);
     }
     @PostMapping

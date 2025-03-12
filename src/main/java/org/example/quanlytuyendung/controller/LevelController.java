@@ -20,23 +20,20 @@ public class LevelController {
     public ResponseEntity<ApiResponse<PageableResponse<LevelResponse>>> getLevels(
             @RequestParam(defaultValue = "0" , required = false) int page,
             @RequestParam(defaultValue = "10", required = false) int size,
-            @RequestParam(value = "name",required = false)String name,
-            @RequestParam (value = "code",required = false)String code
+            @RequestParam(required = false)String search,
+            @RequestParam (defaultValue = "createdAt:DESC")String sort
     ){
-        LevelResponse levelResponse = new LevelResponse();
-        levelResponse.setCode(code);
-        levelResponse.setName(name);
-        ApiResponse<PageableResponse<LevelResponse>> apiResponse = levelService.getLevels(page,size,levelResponse);
+        ApiResponse<PageableResponse<LevelResponse>> apiResponse = levelService.getLevels(page,size,search,sort);
         return ResponseEntity.ok(apiResponse);
     }
     @PostMapping
-    public ResponseEntity<LevelResponse> addLevel(@RequestBody LevelRequest levelRequest) {
-        LevelResponse levelResponse = levelService.addLevel(levelRequest);
+    public ResponseEntity<ApiResponse <LevelResponse>> addLevel(@RequestBody LevelRequest levelRequest) {
+        ApiResponse <LevelResponse> levelResponse = levelService.addLevel(levelRequest);
         return new ResponseEntity<>(levelResponse, HttpStatus.OK);
     }
     @PutMapping
-    public ResponseEntity<LevelResponse> updateLevel(@RequestBody LevelRequest levelRequest) {
-        LevelResponse levelResponse = levelService.updateLevel(levelRequest);
+    public ResponseEntity<ApiResponse <LevelResponse>> updateLevel(@RequestBody LevelRequest levelRequest) {
+        ApiResponse <LevelResponse> levelResponse = levelService.updateLevel(levelRequest);
         return new ResponseEntity<>(levelResponse, HttpStatus.OK);
     }
     @GetMapping

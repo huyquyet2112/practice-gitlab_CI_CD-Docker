@@ -19,11 +19,11 @@ public class EmailTemplateController {
     public ResponseEntity<ApiResponse<PageableResponse<EmailTemplateResponse>>> getEmailTemplates(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
-            @RequestParam(required = false) String name
+            @RequestParam(required = false) String search,
+            @RequestParam(defaultValue = "createdAt:DESC") String sort
     ){
-        EmailTemplateResponse emailTemplateResponse = new EmailTemplateResponse();
-        emailTemplateResponse.setName(name);
-        ApiResponse<PageableResponse<EmailTemplateResponse>> apiResponse = emailTemplateService.getEmailTemplates(page,size,emailTemplateResponse);
+
+        ApiResponse<PageableResponse<EmailTemplateResponse>> apiResponse = emailTemplateService.getEmailTemplates(page,size,search,sort);
         return ResponseEntity.ok(apiResponse);
     }
     @PostMapping

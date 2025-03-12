@@ -7,13 +7,13 @@ import org.example.quanlytuyendung.dto.response.TagResponse;
 import org.example.quanlytuyendung.entity.TagEntity;
 
 public interface TagService {
-    ApiResponse<PageableResponse<TagResponse>> getAllTag(int page, int size,TagResponse tagResponse);
+    ApiResponse<PageableResponse<TagResponse>> getAllTag(int page, int size,String search,String sort);
 
-    TagResponse addTagg(TagRequest tagRequest);
+    ApiResponse<TagResponse> addTagg(TagRequest tagRequest);
 
-    TagResponse updateTag(TagRequest tagRequest);
+    ApiResponse<TagResponse> updateTag(TagRequest tagRequest);
 
-    TagResponse getTag(int id);
+    ApiResponse<TagResponse> getTag(int id);
 
     TagEntity deleteTag(int id);
 }

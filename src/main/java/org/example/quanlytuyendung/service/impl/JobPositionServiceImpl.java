@@ -36,12 +36,17 @@ public class JobPositionServiceImpl  implements JobpositionService {
 
 
     @Override
-    public ApiResponse<PageableResponse<JobPositionResponse>> findAll(int page, int size,JobPositionResponse jobPositionResponse) {
-        Sort sort = Sort.by(Sort.Direction.DESC, "createdAt");
-        Pageable pageData = PageRequest.of(page, size, sort);
+    public ApiResponse<PageableResponse<JobPositionResponse>> findAll(int page, int size,String search,String sort) {
+        String [] sortParam = sort.split(":");
+        String sortField = sortParam[0];
+        Sort.Direction sortDirection = sortParam.length > 1 && sortParam[1].equalsIgnoreCase("ASC") ? Sort.Direction.ASC : Sort.Direction.DESC;
+        Sort orders = Sort.by(sortDirection, sortField);
+        Pageable pageData = PageRequest.of(page, size, orders);
         Map<String,Object> filters = new HashMap<>();
-        if(jobPositionResponse.getName() != null) filters.put("name", jobPositionResponse.getName());
-        if(jobPositionResponse.getCode() != null) filters.put("code", jobPositionResponse.getCode());
+      if (search != null && !search.isEmpty()) {
+          filters.put("name", search);
+          filters.put("code", search);
+      }
         Specification<JobPositionEntity> spec = new BaseSpecification<>(filters);
 
        var jobPositionEntities = jobPositionRepository.findAll(spec,pageData);
@@ -49,7 +54,7 @@ public class JobPositionServiceImpl  implements JobpositionService {
         PageableResponse<JobPositionResponse> pageableResponse = PageableResponse.<JobPositionResponse>builder()
                 .page(page)
                 .size(size)
-                .sort(sort.toString())
+                .sort(orders.toString())
                 .totalPages(jobPositionEntities.getTotalPages())
                 .totalElements(jobPositionEntities.getTotalElements())
                 .numberOfElements(jobPositionEntities.getNumberOfElements())
@@ -62,28 +67,38 @@ public class JobPositionServiceImpl  implements JobpositionService {
     }
 
     @Override
-    public JobPositionResponse addJobPosition(JobPositionRequest request) {
+    public ApiResponse <JobPositionResponse> addJobPosition(JobPositionRequest request) {
         JobPositionEntity jobPositionEntity = jobPositionMapper.toEntity(request);
         jobPositionRepository.save(jobPositionEntity);
 
-        List<JobPositionEntityMap> maps = new ArrayList<>();
-        for (var line : request.getLines()) {
-            for (var position : line.getPositions()) {
-                JobPositionEntityMap jobPositionMap = new JobPositionEntityMap();
-                jobPositionMap.setJobPosition(jobPositionEntity);
-                jobPositionMap.setDepartmentId(line.getDepartment().getId());
-                jobPositionMap.setPositionId(position.getId());
-                maps.add(jobPositionMap);
-            }
-        }
-        jobPositiopMapRepository.saveAll(maps);
-        return new JobPositionResponse(jobPositionEntity.getId());
+       Map<Integer,List<Integer>> departPosit = new HashMap<>();
+       for(var line : request.getLines()){
+           Integer departmentId = line.getDepartment().getId();
+           departPosit.put(departmentId,new ArrayList<>());
+           for(var position : line.getPositions()){
+              departPosit.get(departmentId).add(position.getId());
+           }
+       }
+       List<JobPositionEntityMap> jobPositionEntityMaps = new ArrayList<>();
+       for(var entry : departPosit.entrySet()){
+           Integer departmentId = entry.getKey();
+           List<Integer> positions = entry.getValue();
+           for(var position : positions){
+               JobPositionEntityMap jobPositionEntityMap = new JobPositionEntityMap();
+               jobPositionEntityMap.setDepartmentId(departmentId);
+               jobPositionEntityMap.setJobPosition(jobPositionEntity);
+               jobPositionEntityMap.setPositionId(position);
+               jobPositionEntityMaps.add(jobPositionEntityMap);
+
+           }
+       }
+       jobPositiopMapRepository.saveAll(jobPositionEntityMaps);
+return new ApiResponse<>( new JobPositionResponse(jobPositionEntity.getId()));
     }
 
 
 
-    @Override
-    @Transactional
+
     public JobPositionResponse updatePosition(JobPositionRequest request) {
         JobPositionEntity jobPositionEntity = jobPositionRepository.findById(request.getId())
                 .orElseThrow(() -> new RuntimeException("Job Position not found!"));
@@ -100,35 +115,46 @@ public class JobPositionServiceImpl  implements JobpositionService {
         jobPositionEntity.setIsActive(request.getIsActive());
         jobPositionEntity.setCode(request.getCode());
 
+
         List<JobPositionEntityMap> existingMaps = jobPositiopMapRepository.findByJobPosition(jobPositionEntity);
 
-        Map<Integer, JobPositionEntityMap> existingMapByDept = new HashMap<>();
+
+        Map<String, JobPositionEntityMap> existingMapByDeptPos = new HashMap<>();
         for (JobPositionEntityMap map : existingMaps) {
-            existingMapByDept.put(map.getDepartmentId(), map);
+            String key = map.getDepartmentId() + "-" + map.getPositionId();
+            existingMapByDeptPos.put(key, map);
         }
 
         List<JobPositionEntityMap> updatedMaps = new ArrayList<>();
+
         for (var line : request.getLines()) {
             for (var position : line.getPositions()) {
+                String key = line.getDepartment().getId() + "-" + position.getId();
                 JobPositionEntityMap jobPositionMap;
-                if (existingMapByDept.containsKey(line.getDepartment().getId())) {
-                    jobPositionMap = existingMapByDept.get(line.getDepartment().getId());
-                    jobPositionMap.setPositionId(position.getId());
+
+                if (existingMapByDeptPos.containsKey(key)) {
+                    jobPositionMap = existingMapByDeptPos.get(key);
                 } else {
                     jobPositionMap = new JobPositionEntityMap();
                     jobPositionMap.setJobPosition(jobPositionEntity);
                     jobPositionMap.setDepartmentId(line.getDepartment().getId());
                     jobPositionMap.setPositionId(position.getId());
                 }
+
                 updatedMaps.add(jobPositionMap);
             }
         }
+
+
+        existingMaps.removeAll(updatedMaps);
+        jobPositiopMapRepository.deleteAll(existingMaps);
 
         jobPositiopMapRepository.saveAll(updatedMaps);
         jobPositionRepository.save(jobPositionEntity);
 
         return new JobPositionResponse(jobPositionEntity.getId());
     }
+
 
 
     @Override

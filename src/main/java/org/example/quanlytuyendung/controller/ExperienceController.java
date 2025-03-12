@@ -19,23 +19,23 @@ public class ExperienceController {
     public ResponseEntity<ApiResponse<PageableResponse<ExperienceResponse>>> getExperience(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
-            @RequestParam(required = false) String name
+            @RequestParam(required = false) String search,
+            @RequestParam(defaultValue = "createdAt:DESC") String sort
 
 
     ) {
-        ExperienceResponse experienceResponse = new ExperienceResponse();
-        experienceResponse.setName(name);
-        ApiResponse<PageableResponse<ExperienceResponse>> apiResponse = experienceService.findAll(page,size,experienceResponse);
+
+        ApiResponse<PageableResponse<ExperienceResponse>> apiResponse = experienceService.findAll(page,size,search,sort);
         return ResponseEntity.ok(apiResponse);
     }
     @PostMapping
-    public ResponseEntity<ExperienceResponse> addExperience(@RequestBody ExperienceRequest experienceRequest) {
-        ExperienceResponse experienceResponse = experienceService.addExperience(experienceRequest);
+    public ResponseEntity<ApiResponse <ExperienceResponse>> addExperience(@RequestBody ExperienceRequest experienceRequest) {
+      ApiResponse  <ExperienceResponse> experienceResponse = experienceService.addExperience(experienceRequest);
         return ResponseEntity.ok(experienceResponse);
     }
     @PutMapping
-    public ResponseEntity<ExperienceResponse> updateExperience(@RequestBody ExperienceRequest experienceRequest) {
-        ExperienceResponse experienceResponse = experienceService.updateExperience(experienceRequest);
+    public ResponseEntity<ApiResponse<ExperienceResponse>> updateExperience(@RequestBody ExperienceRequest experienceRequest) {
+        ApiResponse <ExperienceResponse> experienceResponse = experienceService.updateExperience(experienceRequest);
         return ResponseEntity.ok(experienceResponse);
     }
     @GetMapping

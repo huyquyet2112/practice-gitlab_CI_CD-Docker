@@ -12,11 +12,11 @@ public interface IndustryService {
 
 
 
-    ApiResponse<PageableResponse<IndustryResponse>> findAll(int page, int size,IndustryResponse industryResponse);
+    ApiResponse<PageableResponse<IndustryResponse>> findAll(int page, int size,String search,String sort);
 
-     IndustryResponse save(IndustryRequest industryRequest);
+     ApiResponse <IndustryResponse> save(IndustryRequest industryRequest);
 
-     IndustryResponse update(IndustryRequest industryRequest);
+    ApiResponse <IndustryResponse> update(IndustryRequest industryRequest);
 
      ApiResponse<IndustryResponse> findIndustry(int id);
 

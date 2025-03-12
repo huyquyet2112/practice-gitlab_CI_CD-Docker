@@ -20,19 +20,17 @@ public class RecruitmentRoundController {
     public ResponseEntity<ApiResponse<PageableResponse<RecruitmentRoundResponse>>> getRecruitmentRounds(
             @RequestParam(defaultValue = "0" , required = false) int page,
             @RequestParam(defaultValue = "10", required = false) int size,
-            @RequestParam(value = "name",required = false)String name,
-            @RequestParam (value = "code",required = false)String code
+            @RequestParam(required = false)String search,
+            @RequestParam (defaultValue = "createdAt:DESC")String sort
     ) {
-        RecruitmentRoundResponse recruitmentRoundResponse = new RecruitmentRoundResponse();
-        recruitmentRoundResponse.setName(name);
-        recruitmentRoundResponse.setCode(code);
-        ApiResponse<PageableResponse<RecruitmentRoundResponse>> apiResponse = recruitmentRoundService.findRound(page,size,recruitmentRoundResponse);
+
+        ApiResponse<PageableResponse<RecruitmentRoundResponse>> apiResponse = recruitmentRoundService.findRound(page,size,search,sort);
         return ResponseEntity.ok(apiResponse);
 
     }
     @PostMapping
-    public ResponseEntity<RecruitmentRoundResponse> addRecruitmentRound(@RequestBody RecruitmentRoundRequest recruitmentRoundRequest) {
-        RecruitmentRoundResponse recruitmentRoundResponse = recruitmentRoundService.addRecruitmentRound(recruitmentRoundRequest);
+    public ResponseEntity<ApiResponse<RecruitmentRoundResponse>> addRecruitmentRound(@RequestBody RecruitmentRoundRequest recruitmentRoundRequest) {
+       ApiResponse<RecruitmentRoundResponse> recruitmentRoundResponse = recruitmentRoundService.addRecruitmentRound(recruitmentRoundRequest);
         return ResponseEntity.ok(recruitmentRoundResponse);
     }
     @PutMapping

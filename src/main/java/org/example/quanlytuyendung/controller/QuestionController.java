@@ -21,12 +21,11 @@ public class QuestionController {
     public ResponseEntity<ApiResponse<PageableResponse<QuestionResponse>>> getAllQuestion(
             @RequestParam(defaultValue = "0" , required = false) int page,
             @RequestParam(defaultValue = "10", required = false) int size,
-            @RequestParam(value = "name",required = false)String name
+            @RequestParam(required = false)String search,
+            @RequestParam(defaultValue = "createdAt:DESC")String sort
 
     ){
-        QuestionResponse questionResponse = new QuestionResponse();
-        questionResponse.setName(name);
-        ApiResponse<PageableResponse<QuestionResponse>> apiResponse = questionService.findAll(page,size,questionResponse);
+        ApiResponse<PageableResponse<QuestionResponse>> apiResponse = questionService.findAll(page,size,search,sort);
         return new ResponseEntity<>(apiResponse, HttpStatus.OK);
     }
     @PostMapping

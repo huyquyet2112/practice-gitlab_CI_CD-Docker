@@ -26,17 +26,22 @@ public class EmailTemplateServiceImpl implements EmailTemplateService {
     private final EmailTemplateMapper emailTemplateMapper;
 
     @Override
-    public ApiResponse<PageableResponse<EmailTemplateResponse>> getEmailTemplates(int page, int size, EmailTemplateResponse emailTemplateResponse) {
-        Sort sort = Sort.by(Sort.Direction.ASC, "createdAt");
-        Pageable pageable = PageRequest.of(page, size, sort);
+    public ApiResponse<PageableResponse<EmailTemplateResponse>> getEmailTemplates(int page, int size,String search,String sort) {
+        String [] sortParam = sort.split(":");
+        String sortField = sortParam[0];
+        Sort.Direction sortDirection = sortParam.length > 1 && sortParam[1].equalsIgnoreCase("ASC") ? Sort.Direction.ASC : Sort.Direction.DESC;
+        Sort orders = Sort.by(sortDirection, sortField);
+        Pageable pageable = PageRequest.of(page, size, orders);
         Map<String,Object> fileter = new HashMap<>();
-        if (emailTemplateResponse.getName() !=null){fileter.put("name",emailTemplateResponse.getName());}
+         if(search != null && !search.isEmpty()){
+          fileter.put("name", search);
+         }
         Specification<EmailTemplateEntity> spec = new BaseSpecification<>(fileter);
         var emailTemplateEntities = emailTemplateRepository.findAll(spec,pageable);
         PageableResponse<EmailTemplateResponse> pageableResponse =  PageableResponse.<EmailTemplateResponse>builder()
                 .page(page)
                 .size(size)
-                .sort(sort.toString())
+                .sort(orders.toString())
                 .totalPages(emailTemplateEntities.getTotalPages())
                 .totalElements(emailTemplateEntities.getTotalElements())
                 .numberOfElements(emailTemplateEntities.getNumberOfElements())

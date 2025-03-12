@@ -7,11 +7,11 @@ import org.example.quanlytuyendung.dto.response.PageableResponse;
 import org.example.quanlytuyendung.entity.CandicateSourceEntity;
 
 public interface CandicateSourceService {
-    ApiResponse<PageableResponse<CandicateSourceResponse>> findAll(int page, int size, CandicateSourceResponse candicateSourceResponse);
+    ApiResponse<PageableResponse<CandicateSourceResponse>> findAll(int page, int size,String search,String sort);
 
-    CandicateSourceResponse addCandicateSource(CandicateSourceRequest candicateSourceRequest);
+   ApiResponse <CandicateSourceResponse> addCandicateSource(CandicateSourceRequest candicateSourceRequest);
 
-    CandicateSourceResponse updateCandicateSource(CandicateSourceRequest candicateSourceRequest);
+  ApiResponse  <CandicateSourceResponse> updateCandicateSource(CandicateSourceRequest candicateSourceRequest);
 
     CandicateSourceResponse getCandicateSource(int id);
 

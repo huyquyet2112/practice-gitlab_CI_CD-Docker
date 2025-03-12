@@ -28,19 +28,22 @@ public class ExperienceServiceImpl implements ExperienceService {
     private final ExperienceMapper experienceMapper;
 
     @Override
-    public ApiResponse<PageableResponse<ExperienceResponse>> findAll(int page, int size, ExperienceResponse experienceResponse) {
-        Sort sort = Sort.by(Sort.Direction.DESC, "createdAt");
-        Pageable pageable = PageRequest.of(page, size, sort);
+    public ApiResponse<PageableResponse<ExperienceResponse>> findAll(int page, int size,String search,String sort) {
+       String [] sortParam = sort.split(":");
+       String sortField = sortParam[0];
+       Sort.Direction sortDirection = sortParam.length > 1 && sortParam[1].equalsIgnoreCase("ACS") ? Sort.Direction.ASC : Sort.Direction.DESC;
+       Sort order = Sort.by(sortDirection, sortField);
+        Pageable pageable = PageRequest.of(page, size, order);
         Map<String , Object> filter = new HashMap<>();
-        if (experienceResponse.getName() != null) {
-            filter.put("name", experienceResponse.getName());
-        }
+      if(search != null && !search.isEmpty()){
+          filter.put("name", search);
+      }
         Specification<ExperienceEntity> spec = new BaseSpecification<>(filter);
         var pageData = experienceRepository.findAll(spec, pageable);
         PageableResponse<ExperienceResponse> pageableResponse =  PageableResponse.<ExperienceResponse>builder()
                 .page(page)
                 .size(size)
-                .sort(sort.toString())
+                .sort(order.toString())
                 .totalPages(pageData.getTotalPages())
                 .totalElements(pageData.getTotalElements())
                 .numberOfElements(pageData.getNumberOfElements())
@@ -51,20 +54,20 @@ public class ExperienceServiceImpl implements ExperienceService {
     }
 
     @Override
-    public ExperienceResponse addExperience(ExperienceRequest experienceRequest) {
+    public ApiResponse <ExperienceResponse> addExperience(ExperienceRequest experienceRequest) {
         ExperienceEntity experienceEntity = experienceMapper.toEntity(experienceRequest);
         experienceRepository.save(experienceEntity);
-        return new ExperienceResponse(experienceEntity.getId());
+        return new ApiResponse<>(new ExperienceResponse(experienceEntity.getId()));
     }
 
     @Override
-    public ExperienceResponse updateExperience(ExperienceRequest experienceRequest) {
+    public ApiResponse <ExperienceResponse> updateExperience(ExperienceRequest experienceRequest) {
         ExperienceEntity experienceEntity = experienceMapper.toEntity(experienceRequest);
         experienceEntity.setId(experienceRequest.getId());
         experienceEntity.setDescription(experienceRequest.getDescription());
         experienceEntity.setIsActive(experienceRequest.getIsActive());
         experienceRepository.save(experienceEntity);
-        return new ExperienceResponse(experienceEntity.getId());
+        return new ApiResponse<>(new ExperienceResponse(experienceEntity.getId()));
     }
 
     @Override

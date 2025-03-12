@@ -7,11 +7,11 @@ import org.example.quanlytuyendung.dto.response.PageableResponse;
 import org.example.quanlytuyendung.entity.GroupReasonEntity;
 
 public interface GroupReasonService {
-    ApiResponse<PageableResponse<GroupReasonResponse>> findAll(int page, int size,GroupReasonResponse groupReasonResponse);
+    ApiResponse<PageableResponse<GroupReasonResponse>> findAll(int page, int size,String search,String sort);
 
-    GroupReasonResponse addGroupReason(GroupReasonRequest groupReasonRequest);
+   ApiResponse <GroupReasonResponse> addGroupReason(GroupReasonRequest groupReasonRequest);
 
-    GroupReasonResponse updateGroupReason(GroupReasonRequest groupReasonRequest);
+    ApiResponse <GroupReasonResponse>  updateGroupReason(GroupReasonRequest groupReasonRequest);
 
     ApiResponse<GroupReasonResponse> detailsGroupReason(int id);
 

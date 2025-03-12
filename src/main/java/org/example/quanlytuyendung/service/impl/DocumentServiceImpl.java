@@ -27,18 +27,23 @@ public class DocumentServiceImpl implements DocumentService {
     private final DocumentMapper documentMapper;
 
     @Override
-    public ApiResponse<PageableResponse<DocumentResponse>> getDocument(int page, int size, DocumentResponse documentResponse) {
-        Sort sort = Sort.by(Sort.Direction.ASC, "createdAt");
-        Pageable pageable = PageRequest.of(page, size, sort);
+    public ApiResponse<PageableResponse<DocumentResponse>> getDocument(int page, int size, String search, String sort) {
+        String [] sortParam = sort.split(":");
+        String sortField = sortParam[0];
+        Sort.Direction sortDirection = sortParam.length>1 && sortParam[1].equalsIgnoreCase("ASC") ? Sort.Direction.ASC : Sort.Direction.DESC;
+        Sort orders = Sort.by(sortDirection , sortField);
+        Pageable pageable = PageRequest.of(page, size, orders);
         Map<String,Object> filter = new HashMap<>();
-        if(documentResponse.getCode()!=null){filter.put("code",documentResponse.getCode());}
-        if(documentResponse.getName()!=null){filter.put("name",documentResponse.getName());}
+       if(search != null && !search.isEmpty()){
+           filter.put("search", search);
+           filter.put("code", search);
+       }
         Specification<DocumentEntity> spec = new BaseSpecification<>(filter);
         var result = documentRepository.findAll(spec,pageable);
         PageableResponse<DocumentResponse> pageableResponse = PageableResponse.<DocumentResponse>builder()
                 .page(page)
                 .size(size)
-                .sort(sort.toString())
+                .sort(orders.toString())
                 .totalPages(result.getTotalPages())
                 .totalElements(result.getTotalElements())
                 .numberOfElements(result.getNumberOfElements())

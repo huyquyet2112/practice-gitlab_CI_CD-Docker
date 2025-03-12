@@ -7,7 +7,7 @@ import org.example.quanlytuyendung.dto.response.WorkTypeResponse;
 import org.example.quanlytuyendung.entity.WorkTypeEntity;
 
 public interface WorkTypeService {
-    ApiResponse<PageableResponse<WorkTypeResponse>> getWorkTypeList(int page, int size, WorkTypeResponse workTypeResponse);
+    ApiResponse<PageableResponse<WorkTypeResponse>> getWorkTypeList(int page, int size, String search, String sort);
 
     ApiResponse<WorkTypeResponse> addWorkType(WorkTypeRequest workTypeRequest);
 

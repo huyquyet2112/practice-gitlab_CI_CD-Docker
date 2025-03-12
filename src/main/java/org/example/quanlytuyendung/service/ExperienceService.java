@@ -7,11 +7,11 @@ import org.example.quanlytuyendung.dto.response.PageableResponse;
 import org.example.quanlytuyendung.entity.ExperienceEntity;
 
 public interface ExperienceService {
-    ApiResponse<PageableResponse<ExperienceResponse>> findAll(int page, int size, ExperienceResponse experienceResponse);
+    ApiResponse<PageableResponse<ExperienceResponse>> findAll(int page, int size,String search,String sort);
 
-    ExperienceResponse addExperience(ExperienceRequest experienceRequest);
+   ApiResponse <ExperienceResponse> addExperience(ExperienceRequest experienceRequest);
 
-    ExperienceResponse updateExperience(ExperienceRequest experienceRequest);
+   ApiResponse <ExperienceResponse> updateExperience(ExperienceRequest experienceRequest);
 
     ApiResponse<ExperienceResponse> getExperience(int id);
 

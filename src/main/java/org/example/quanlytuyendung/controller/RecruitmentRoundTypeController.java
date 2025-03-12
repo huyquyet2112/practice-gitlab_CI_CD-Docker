@@ -20,24 +20,22 @@ public class RecruitmentRoundTypeController {
     public ResponseEntity<ApiResponse<PageableResponse<RecruitmentRoundTypeResponse>>> getRecruitmentRoundTypeList(
             @RequestParam(defaultValue = "0" , required = false) int page,
             @RequestParam(defaultValue = "10", required = false) int size,
-            @RequestParam(value = "name",required = false)String name,
-            @RequestParam (value = "code",required = false)String code
+            @RequestParam(required = false)String search,
+            @RequestParam (defaultValue = "createdAt:DESC")String sort
     ){
-        RecruitmentRoundTypeResponse recruitmentRoundTypeResponse = new RecruitmentRoundTypeResponse();
-        recruitmentRoundTypeResponse.setName(name);
-        recruitmentRoundTypeResponse.setCode(code);
-        ApiResponse<PageableResponse<RecruitmentRoundTypeResponse>> response = recruitmentRoundTypeService.findAll(page,size,recruitmentRoundTypeResponse);
+
+        ApiResponse<PageableResponse<RecruitmentRoundTypeResponse>> response = recruitmentRoundTypeService.findAll(page,size,search,sort);
         return ResponseEntity.ok(response);
 
     }
     @PostMapping
-    public ResponseEntity<RecruitmentRoundTypeResponse> addRecruitmentRoundType(@RequestBody RecruitmentRoundTypeRequest request){
-        RecruitmentRoundTypeResponse recruitmentRoundTypeResponse = recruitmentRoundTypeService.addRoundType(request);
+    public ResponseEntity<ApiResponse<RecruitmentRoundTypeResponse>> addRecruitmentRoundType(@RequestBody RecruitmentRoundTypeRequest request){
+        ApiResponse<RecruitmentRoundTypeResponse> recruitmentRoundTypeResponse = recruitmentRoundTypeService.addRoundType(request);
         return ResponseEntity.ok(recruitmentRoundTypeResponse);
     }
     @PutMapping
-    public ResponseEntity<RecruitmentRoundTypeResponse> updateRecruitmentRoundType(@RequestBody RecruitmentRoundTypeRequest request){
-        RecruitmentRoundTypeResponse recruitmentRoundTypeResponse = recruitmentRoundTypeService.updateRoundType(request);
+    public ResponseEntity<ApiResponse<RecruitmentRoundTypeResponse>> updateRecruitmentRoundType(@RequestBody RecruitmentRoundTypeRequest request){
+        ApiResponse<RecruitmentRoundTypeResponse> recruitmentRoundTypeResponse = recruitmentRoundTypeService.updateRoundType(request);
         return ResponseEntity.ok(recruitmentRoundTypeResponse);
     }
     @GetMapping

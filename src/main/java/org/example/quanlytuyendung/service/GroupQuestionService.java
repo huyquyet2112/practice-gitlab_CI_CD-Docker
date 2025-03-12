@@ -7,7 +7,7 @@ import org.example.quanlytuyendung.dto.response.PageableResponse;
 import org.example.quanlytuyendung.entity.GroupQuestionEntity;
 
 public interface GroupQuestionService {
-    ApiResponse<PageableResponse<GroupQuestionResponse>> getGroupQuestions(int page, int size, GroupQuestionResponse groupQuestionResponse);
+    ApiResponse<PageableResponse<GroupQuestionResponse>> getGroupQuestions(int page, int size,String search,String sort);
 
     ApiResponse<GroupQuestionResponse> addGroupQuestion(GroupQuestionRequest groupQuestionRequest);
 

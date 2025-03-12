@@ -7,7 +7,7 @@ import org.example.quanlytuyendung.dto.response.PageableResponse;
 import org.example.quanlytuyendung.entity.EmailTemplateEntity;
 
 public interface EmailTemplateService {
-    ApiResponse<PageableResponse<EmailTemplateResponse>> getEmailTemplates(int page, int size, EmailTemplateResponse emailTemplateResponse);
+    ApiResponse<PageableResponse<EmailTemplateResponse>> getEmailTemplates(int page, int size,String search,String sort);
 
     ApiResponse<EmailTemplateResponse> createEmailTemplate(EmailTemplateRequest emailTemplateRequest);
 

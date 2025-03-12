@@ -27,19 +27,24 @@ public class LevelServiceImpl implements LevelService {
     private final LevelRepository levelRepository;
     private final LevelMapper levelMapper;
     @Override
-    public ApiResponse<PageableResponse<LevelResponse>> getLevels(int page, int size, LevelResponse levelResponse) {
-        Sort sort = Sort.by(Sort.Direction.DESC, "createdAt");
-        Pageable pageable = PageRequest.of(page, size, sort);
+    public ApiResponse<PageableResponse<LevelResponse>> getLevels(int page, int size,String search,String sort) {
+        String [] sortParam = sort.split(":");
+        String sortField = sortParam[0];
+        Sort.Direction sortDirection = sortParam.length > 1 && sortParam[1].equalsIgnoreCase("asc") ? Sort.Direction.ASC : Sort.Direction.DESC;
+        Sort orders = Sort.by(sortDirection, sortField);
+        Pageable pageable = PageRequest.of(page, size, orders);
         Map<String, Object> filters = new HashMap<>();
-        if (levelResponse != null) { filters.put("name", levelResponse.getName()); }
-        if (levelResponse != null) { filters.put("code", levelResponse.getCode()); }
+        if (search != null && !search.isEmpty()) {
+            filters.put("name", search);
+            filters.put("code", search);
+        }
         Specification<LevelEntity> spec = new BaseSpecification<>(filters);
         var result = levelRepository.findAll(spec, pageable);
 
         PageableResponse<LevelResponse> pageableResponse = PageableResponse.<LevelResponse>builder()
                 .page(page)
                 .size(size)
-                .sort(sort.toString())
+                .sort(orders.toString())
                 .totalPages(result.getTotalPages())
                 .totalElements(result.getTotalElements())
                 .numberOfElements(result.getNumberOfElements())
@@ -50,21 +55,21 @@ public class LevelServiceImpl implements LevelService {
     }
 
     @Override
-    public LevelResponse addLevel(LevelRequest levelRequest) {
+    public ApiResponse<LevelResponse> addLevel(LevelRequest levelRequest) {
        LevelEntity levelEntity = levelMapper.toLevelEntity(levelRequest);
        levelRepository.save(levelEntity);
-        return new LevelResponse(levelEntity.getId());
+        return new ApiResponse<>(new LevelResponse(levelEntity.getId())) ;
     }
 
     @Override
-    public LevelResponse updateLevel(LevelRequest levelRequest) {
+    public ApiResponse<LevelResponse> updateLevel(LevelRequest levelRequest) {
         LevelEntity levelEntity = levelRepository.findById(levelRequest.getId()).get();
         levelEntity.setName(levelRequest.getName());
         levelEntity.setCode(levelRequest.getCode());
         levelEntity.setDescription(levelRequest.getDescription());
         levelEntity.setIsActive(levelRequest.getIsActive());
         levelRepository.save(levelEntity);
-        return new LevelResponse(levelEntity.getId());
+        return new ApiResponse<>(new LevelResponse(levelEntity.getId())) ;
     }
 
     @Override

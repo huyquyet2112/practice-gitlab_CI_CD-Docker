@@ -28,14 +28,17 @@ public class TagServiceImpl implements TagService {
 
 
     @Override
-    public ApiResponse<PageableResponse<TagResponse>> getAllTag(int page, int size, TagResponse tagResponse) {
-        Sort sort = Sort.by(Sort.Direction.DESC, "createdAt");
-        Pageable pageable = PageRequest.of(page, size, sort);
+    public ApiResponse<PageableResponse<TagResponse>> getAllTag(int page, int size,String search ,String sort ) {
+       String [] sortParam = sort.split(":");
+       String sortField = sortParam[0];
+       Sort.Direction sortDirection = sortParam.length > 1 && sortParam[1].equalsIgnoreCase("ASC") ? Sort.Direction.ASC : Sort.Direction.DESC;
+        Sort orders = Sort.by(sortDirection, sortField);
+        Pageable pageable = PageRequest.of(page, size, orders);
 
         Map<String, Object> filter = new HashMap<>();
-        if (tagResponse.getName() != null) {
-            filter.put("name", tagResponse.getName());
-        }
+   if (search != null && !search.isEmpty()) {
+       filter.put("name", search);
+   }
 
         Specification<TagEntity> specification = new BaseSpecification<>(filter);
         var tagEntities = tagRepository.findAll(specification, pageable);
@@ -43,7 +46,7 @@ public class TagServiceImpl implements TagService {
         PageableResponse<TagResponse> pageableResponse = PageableResponse.<TagResponse>builder()
                 .page(page)
                 .size(size)
-                .sort(sort.toString())
+                .sort(orders.toString())
                 .totalPages(tagEntities.getTotalPages())
                 .totalElements(tagEntities.getTotalElements())
                 .numberOfElements(tagEntities.getNumberOfElements())
@@ -55,28 +58,28 @@ public class TagServiceImpl implements TagService {
 
 
     @Override
-    public TagResponse addTagg(TagRequest tagRequest) {
+    public ApiResponse <TagResponse> addTagg(TagRequest tagRequest) {
         if(tagRepository.existsByName(tagRequest.getName())) {
             throw new IllegalArgumentException("Try again! Name exists!");
         }
         TagEntity tagEntity = tagMapper.toEntity(tagRequest);
         tagRepository.save(tagEntity);
-        return new TagResponse(tagEntity.getId());
+        return new ApiResponse<>(new TagResponse(tagEntity.getId())) ;
     }
 
     @Override
-    public TagResponse updateTag(TagRequest tagRequest) {
+    public ApiResponse <TagResponse>  updateTag(TagRequest tagRequest) {
         TagEntity tagEntity = tagRepository.findById(tagRequest.getId()).orElseThrow(() -> new RuntimeException("Job Position not found!"));
         tagEntity.setName(tagRequest.getName());
         tagEntity.setIsActive(tagRequest.getIsActive());
         tagRepository.save(tagEntity);
-        return new TagResponse(tagEntity.getId());
+        return new ApiResponse<>(new TagResponse(tagEntity.getId())) ;
     }
 
     @Override
-    public TagResponse getTag(int id) {
+    public ApiResponse <TagResponse>  getTag(int id) {
         TagEntity tagEntity = tagRepository.findById(id).orElseThrow(() -> new RuntimeException("Job Position not found!"));
-        return tagMapper.toResponse(tagEntity);
+        return new ApiResponse<>(tagMapper.toResponse(tagEntity));
     }
 
     @Override

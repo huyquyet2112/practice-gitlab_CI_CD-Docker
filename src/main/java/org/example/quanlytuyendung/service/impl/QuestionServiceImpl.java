@@ -31,17 +31,22 @@ public class QuestionServiceImpl implements QuestionService {
     private final GroupQuestionRepository groupQuestionRepository;
 
     @Override
-    public ApiResponse<PageableResponse<QuestionResponse>> findAll(int page, int size, QuestionResponse questionResponse) {
-        Sort sort = Sort.by(Sort.Direction.ASC, "createdAt");
-        Pageable questionPageable = PageRequest.of(page, size, sort);
+    public ApiResponse<PageableResponse<QuestionResponse>> findAll(int page, int size,String search, String sort) {
+        String [] sortParam = sort.split(":");
+        String sortField = sortParam[0];
+        Sort.Direction sortDirection = sortParam.length > 1 && sortParam[1].equalsIgnoreCase("ASC") ? Sort.Direction.DESC : Sort.Direction.ASC;
+        Sort orders = Sort.by(sortDirection, sortField);
+        Pageable questionPageable = PageRequest.of(page, size, orders);
         Map<String,Object> filter = new HashMap<>();
-        if (questionResponse == null) {filter.put("name",questionResponse.getName());}
+      if(search != null && !search.isEmpty()){
+          filter.put("name",search);
+      }
         Specification<QuestionEntity> specification = new BaseSpecification<>(filter);
         var questions = questionRepository.findAll(specification,questionPageable);
         PageableResponse<QuestionResponse> pageableResponse = PageableResponse.<QuestionResponse>builder()
                 .page(page)
                 .size(size)
-                .sort(sort.toString())
+                .sort(orders.toString())
                 .totalPages(questions.getTotalPages())
                 .totalElements(questions.getTotalElements())
                 .numberOfElements(questions.getNumberOfElements())

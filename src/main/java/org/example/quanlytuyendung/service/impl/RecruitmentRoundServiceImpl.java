@@ -33,13 +33,18 @@ public class RecruitmentRoundServiceImpl implements RecruitmentRoundService {
 
 
     @Override
-    public ApiResponse<PageableResponse<RecruitmentRoundResponse>> findRound(int page, int size, RecruitmentRoundResponse recruitmentRoundResponse) {
-        Sort sort = Sort.by(Sort.Direction.DESC, "createdAt");
-        Pageable pageable = PageRequest.of(page, size, sort);
+    public ApiResponse<PageableResponse<RecruitmentRoundResponse>> findRound(int page, int size, String search , String sort) {
+        String [] sortParam = sort.split(":");
+        String sortField = sortParam[0];
+        Sort.Direction sortDirection = sortParam.length > 1 && sortParam[1].equalsIgnoreCase("ASC") ? Sort.Direction.DESC : Sort.Direction.ASC;
+        Sort orders = Sort.by(sortDirection, sortField);
+        Pageable pageable = PageRequest.of(page, size, orders);
 
         Map<String, Object> filter = new HashMap<>();
-        if (recruitmentRoundResponse.getName() != null) filter.put("name", recruitmentRoundResponse.getName());
-        if (recruitmentRoundResponse.getCode() != null) filter.put("code", recruitmentRoundResponse.getCode());
+      if(search != null && !search.isEmpty()){
+          filter.put("name",search);
+          filter.put("code",search);
+      }
 
         Specification<RecruitmentRoundEntity> specification = new BaseSpecification<>(filter);
         var result = recruitmentRoundRepository.findAll(specification, pageable);
@@ -65,7 +70,7 @@ public class RecruitmentRoundServiceImpl implements RecruitmentRoundService {
         PageableResponse<RecruitmentRoundResponse> pageableResponse = PageableResponse.<RecruitmentRoundResponse>builder()
                 .page(page)
                 .size(size)
-                .sort(sort.toString())
+                .sort(orders.toString())
                 .numberOfElements(result.getNumberOfElements())
                 .totalElements(result.getTotalElements())
                 .content(responseList)
@@ -75,12 +80,12 @@ public class RecruitmentRoundServiceImpl implements RecruitmentRoundService {
     }
 
     @Override
-    public RecruitmentRoundResponse addRecruitmentRound(RecruitmentRoundRequest recruitmentRoundRequest) {
+    public ApiResponse<RecruitmentRoundResponse> addRecruitmentRound(RecruitmentRoundRequest recruitmentRoundRequest) {
        RecruitmentRoundEntity recruitmentRoundEntity = recruitmentRoundMapper.toEntity(recruitmentRoundRequest);
         RecruitmentRoundTypeEntity recruitmentRoundTypeEntity = recruitmentRoundTypeRepository.findById(recruitmentRoundEntity.getRecruitmentRoundType().getId()).orElse(null);
         recruitmentRoundEntity.setRecruitmentRoundType(recruitmentRoundTypeEntity);
         recruitmentRoundRepository.save(recruitmentRoundEntity);
-        return new RecruitmentRoundResponse(recruitmentRoundEntity.getId());
+        return new ApiResponse<>(new RecruitmentRoundResponse(recruitmentRoundEntity.getId()));
     }
 
     @Override

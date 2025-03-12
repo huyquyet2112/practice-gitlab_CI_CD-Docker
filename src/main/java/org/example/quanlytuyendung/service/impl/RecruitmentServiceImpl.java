@@ -33,18 +33,23 @@ public class RecruitmentServiceImpl implements RecruitmentService {
 
 
     @Override
-    public ApiResponse<PageableResponse<RecruitmentChanelResponse>> findAllChanel(int page, int size, RecruitmentChanelResponse response) {
-        Sort sort = Sort.by(Sort.Direction.ASC, "createdAt");
-        Pageable pageable = PageRequest.of(page, size, sort);
+    public ApiResponse<PageableResponse<RecruitmentChanelResponse>> findAllChanel(int page, int size,String search,String sort) {
+        String [] sortParam = sort.split(":");
+        String sortField = sortParam[0];
+        Sort.Direction sortDirection = sortParam.length > 1 && sortParam[1].equalsIgnoreCase("ASC") ? Sort.Direction.DESC : Sort.Direction.ASC;
+        Sort orders = Sort.by(sortDirection,sortField);
+        Pageable pageable = PageRequest.of(page, size, orders);
         Map<String , Object> filter = new HashMap<>();
-        if (response.getName() != null) filter.put("name", response.getName());
+        if(search != null && !search.isEmpty()){
+            filter.put("name",search);
+        }
 
         Specification<RecruitmentChanelEntity> spec = new BaseSpecification<>(filter);
         var pageData = recruitmentChanelRepository.findAll(spec,pageable);
         PageableResponse<RecruitmentChanelResponse> pageableResponse =  PageableResponse.<RecruitmentChanelResponse>builder()
                 .page(page)
                 .size(size)
-                .sort(sort.toString())
+                .sort(orders.toString())
                 .totalPages(pageData.getTotalPages())
                 .totalElements(pageData.getTotalElements())
                 .numberOfElements(pageData.getNumberOfElements())
@@ -55,24 +60,24 @@ public class RecruitmentServiceImpl implements RecruitmentService {
     }
 
     @Override
-    public RecruitmentChanelResponse addRecruitmentChanel(RecruitmentChanelRequest request) {
+    public ApiResponse<RecruitmentChanelResponse> addRecruitmentChanel(RecruitmentChanelRequest request) {
         RecruitmentChanelEntity recruitmentChanelEntity = recruitmentChanelMapper.toEntity(request);
         CandicateSourceEntity candicateSourceEntity = candicateSourceRepository.findById(request.getCandicateSource().getId()).orElse(null);
         recruitmentChanelEntity.setCandicateSource(candicateSourceEntity);
 
         recruitmentChanelRepository.save(recruitmentChanelEntity);
-        return new RecruitmentChanelResponse(recruitmentChanelEntity.getId());
+        return new ApiResponse<>( new RecruitmentChanelResponse(recruitmentChanelEntity.getId()));
     }
 
     @Override
-    public RecruitmentChanelResponse findRecruimentChanel(int id) {
+    public ApiResponse<RecruitmentChanelResponse> findRecruimentChanel(int id) {
         RecruitmentChanelEntity recruitmentChanelEntity = recruitmentChanelRepository.findById(id).orElse(null);
 
-        return recruitmentChanelMapper.toResponse(recruitmentChanelEntity);
+        return new ApiResponse<>(recruitmentChanelMapper.toResponse(recruitmentChanelEntity)) ;
     }
 
     @Override
-    public RecruitmentChanelResponse updateRecruitmentChanel(RecruitmentChanelRequest request) {
+    public ApiResponse<RecruitmentChanelResponse> updateRecruitmentChanel(RecruitmentChanelRequest request) {
         RecruitmentChanelEntity recruitmentChanelEntity = recruitmentChanelRepository.findById(request.getId()).orElse(null);
         recruitmentChanelEntity.setName(request.getName());
         recruitmentChanelEntity.setDescription(request.getDescription());
@@ -80,7 +85,7 @@ public class RecruitmentServiceImpl implements RecruitmentService {
         CandicateSourceEntity candicateSourceEntity = candicateSourceRepository.findById(request.getCandicateSource().getId()).orElse(null);
         recruitmentChanelEntity.setCandicateSource(candicateSourceEntity);
         recruitmentChanelRepository.save(recruitmentChanelEntity);
-        return new RecruitmentChanelResponse(recruitmentChanelEntity.getId());
+        return new ApiResponse<>( new RecruitmentChanelResponse(recruitmentChanelEntity.getId()));
     }
 
     @Override

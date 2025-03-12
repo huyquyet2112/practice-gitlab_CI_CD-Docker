@@ -11,7 +11,7 @@ import java.util.List;
 @Mapper(componentModel = "spring", uses = {IndustryMapper.class, JobPositionMapMapper.class})
 public interface JobPositionMapper {
     @Mapping(target = "industry", source = "jobPositionEntity.industry", qualifiedByName = "toResponseName")
-    @Mapping(target = "lines", source = "jobPositionEntityMaps")
+    @Mapping(target = "lines", source = "jobPositionEntityMaps", qualifiedByName = "toLineResponses")
     JobPositionResponse toResponseDetails(JobPositionEntity jobPositionEntity, List<JobPositionEntityMap> jobPositionEntityMaps);
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "industry", source = "jobPositionEntity.industry", qualifiedByName = "toResponseName")

@@ -7,7 +7,7 @@ import org.example.quanlytuyendung.dto.response.QuestionResponse;
 import org.example.quanlytuyendung.entity.QuestionEntity;
 
 public interface QuestionService {
-    ApiResponse<PageableResponse<QuestionResponse>> findAll(int page, int size, QuestionResponse questionResponse);
+    ApiResponse<PageableResponse<QuestionResponse>> findAll(int page, int size, String search, String sort);
 
     ApiResponse<QuestionResponse> addQuestion(QuestionRequest questionRequest);
 

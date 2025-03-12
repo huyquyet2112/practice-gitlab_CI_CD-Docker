@@ -7,9 +7,9 @@ import org.example.quanlytuyendung.dto.response.PageableResponse;
 import org.example.quanlytuyendung.entity.JobPositionEntity;
 
 public interface JobpositionService {
-    ApiResponse <PageableResponse<JobPositionResponse>> findAll(int page, int size,JobPositionResponse jobPositionResponse);
+    ApiResponse <PageableResponse<JobPositionResponse>> findAll(int page, int size,String search,String sort);
 
-    JobPositionResponse addJobPosition(JobPositionRequest request);
+    ApiResponse<JobPositionResponse> addJobPosition(JobPositionRequest request);
 
     JobPositionResponse updatePosition(JobPositionRequest request);
 

@@ -27,16 +27,22 @@ public class RequirementServiceImpl implements RequirementService {
 
 
     @Override
-    public ApiResponse<PageableResponse<RequirementResponse>> findAll(int page, int size, RequirementResponse requirementResponse) {
-        Sort sort = Sort.by(Sort.Direction.DESC, "createdAt");
-        Pageable pageable = PageRequest.of(page, size, sort);
+    public ApiResponse<PageableResponse<RequirementResponse>> findAll(int page, int size,String search ,String sort) {
+        String [] sortParam = sort.split(":");
+        String sortField = sortParam[0];
+        Sort.Direction sortDirection = sortParam.length > 1 && sortParam[1].equalsIgnoreCase("ASC") ? Sort.Direction.DESC : Sort.Direction.ASC;
+        Sort orders = Sort.by(sortDirection, sortField);
+        Pageable pageable = PageRequest.of(page, size, orders);
         Map<String, Object> filters = new HashMap<>();
+        if (search != null && !search.isEmpty()) {
+            filters.put("name", search);
+        }
         Specification<RequirementEntity> spec = new BaseSpecification<>(filters);
         var pageData = requirementRepository.findAll(spec, pageable);
         PageableResponse<RequirementResponse> pageableResponse = PageableResponse.<RequirementResponse>builder()
                 .page(page)
                 .size(size)
-                .sort(sort.toString())
+                .sort(orders.toString())
                 .totalPages(pageData.getTotalPages())
                 .totalElements(pageData.getTotalElements())
                 .numberOfElements(pageData.getNumberOfElements())
@@ -47,21 +53,21 @@ public class RequirementServiceImpl implements RequirementService {
     }
 
     @Override
-    public RequirementResponse addRequirement(RequirementRequest requirementRequest) {
+    public ApiResponse<RequirementResponse> addRequirement(RequirementRequest requirementRequest) {
         RequirementEntity requirementEntity = RequirementMapper.toEntity(requirementRequest);
         requirementRepository.save(requirementEntity);
-        return new RequirementResponse(requirementEntity.getId());
+        return new ApiResponse<>( new RequirementResponse(requirementEntity.getId()));
     }
 
     @Override
-    public RequirementResponse updateRequirement(RequirementRequest requirementRequest) {
+    public ApiResponse<RequirementResponse> updateRequirement(RequirementRequest requirementRequest) {
         RequirementEntity requirementEntity = requirementRepository.findById(requirementRequest.getId()).orElse(null);
         requirementEntity.setName(requirementRequest.getName());
         requirementEntity.setDescription(requirementRequest.getDescription());
         requirementEntity.setIsActive(requirementRequest.getIsActive());
         requirementEntity.setDepartment(requirementEntity.getDepartment());
         requirementRepository.save(requirementEntity);
-        return new RequirementResponse(requirementEntity.getId());
+        return new ApiResponse<>( new RequirementResponse(requirementEntity.getId()));
     }
 
     @Override

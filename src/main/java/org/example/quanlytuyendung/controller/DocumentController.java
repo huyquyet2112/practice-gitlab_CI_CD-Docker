@@ -21,13 +21,11 @@ public class DocumentController {
     public ResponseEntity<ApiResponse<PageableResponse<DocumentResponse>>>  getDocument(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
-            @RequestParam(required = false) String name,
-            @RequestParam(required = false) String code
+            @RequestParam(required = false) String search,
+            @RequestParam(defaultValue = "createdAt:DESC") String sort
     ){
-       DocumentResponse documentResponse = new DocumentResponse();
-       documentResponse.setCode(code);
-       documentResponse.setName(name);
-        ApiResponse<PageableResponse<DocumentResponse>> documentResponseApiResponse = documentService.getDocument(page,size,documentResponse);
+
+        ApiResponse<PageableResponse<DocumentResponse>> documentResponseApiResponse = documentService.getDocument(page,size,search,sort);
         return  ResponseEntity.ok(documentResponseApiResponse);
 
     }

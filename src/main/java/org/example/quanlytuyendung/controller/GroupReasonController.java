@@ -22,22 +22,20 @@ public class GroupReasonController {
     public ResponseEntity<ApiResponse<PageableResponse<GroupReasonResponse>>> getAllGroupReason(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
-            @RequestParam(required = false) String name,
-            @RequestParam(required = false) String code) {
-        GroupReasonResponse groupReasonResponse = new GroupReasonResponse();
-        groupReasonResponse.setName(name);
-        groupReasonResponse.setCode(code);
-        ApiResponse<PageableResponse<GroupReasonResponse>> pageableResponseApiResponse = groupReasonService.findAll(page,size,groupReasonResponse);
+            @RequestParam(required = false) String search,
+            @RequestParam(defaultValue = "createdAt:DESC") String sort) {
+
+        ApiResponse<PageableResponse<GroupReasonResponse>> pageableResponseApiResponse = groupReasonService.findAll(page,size,search,sort);
         return new ResponseEntity<>(pageableResponseApiResponse, HttpStatus.OK);
     }
     @PostMapping
-    public ResponseEntity<GroupReasonResponse> addGroupReason(@RequestBody GroupReasonRequest groupReasonRequest) {
-        GroupReasonResponse groupReasonResponse = groupReasonService.addGroupReason(groupReasonRequest);
+    public ResponseEntity<ApiResponse<GroupReasonResponse>> addGroupReason(@RequestBody GroupReasonRequest groupReasonRequest) {
+       ApiResponse <GroupReasonResponse> groupReasonResponse = groupReasonService.addGroupReason(groupReasonRequest);
         return new ResponseEntity<>(groupReasonResponse, HttpStatus.OK);
     }
     @PutMapping
-    public ResponseEntity<GroupReasonResponse> updateGroupReason(@RequestBody GroupReasonRequest groupReasonRequest) {
-        GroupReasonResponse groupReasonResponse = groupReasonService.updateGroupReason(groupReasonRequest);
+    public ResponseEntity<ApiResponse <GroupReasonResponse>> updateGroupReason(@RequestBody GroupReasonRequest groupReasonRequest) {
+      ApiResponse  <GroupReasonResponse> groupReasonResponse = groupReasonService.updateGroupReason(groupReasonRequest);
         return new ResponseEntity<>(groupReasonResponse, HttpStatus.OK);
     }
     @GetMapping

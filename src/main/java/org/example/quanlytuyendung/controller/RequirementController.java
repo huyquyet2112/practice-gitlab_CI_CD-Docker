@@ -20,22 +20,21 @@ public class RequirementController {
     public ResponseEntity<ApiResponse<PageableResponse<RequirementResponse>>> getRequirements(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
-            @RequestParam(required = false) String name
+            @RequestParam(required = false) String search,
+            @RequestParam(defaultValue = "createdAt:DESC") String sort
     ) {
-        RequirementResponse requirementResponse = new RequirementResponse();
-        requirementResponse.setName(name);
-        ApiResponse<PageableResponse<RequirementResponse>> apiResponse = requirementService.findAll(page,size,requirementResponse);
+        ApiResponse<PageableResponse<RequirementResponse>> apiResponse = requirementService.findAll(page,size,search,sort);
         return new ResponseEntity<>(apiResponse, HttpStatus.OK);
 
     }
     @PostMapping
-    public ResponseEntity<RequirementResponse> createRequirement(@RequestBody RequirementRequest requirementRequest) {
-        RequirementResponse requirementResponse = requirementService.addRequirement(requirementRequest);
+    public ResponseEntity<ApiResponse<RequirementResponse>> createRequirement(@RequestBody RequirementRequest requirementRequest) {
+       ApiResponse <RequirementResponse> requirementResponse = requirementService.addRequirement(requirementRequest);
         return new ResponseEntity<>(requirementResponse, HttpStatus.CREATED);
     }
     @PutMapping
-    public ResponseEntity<RequirementResponse> updateRequirement(@RequestBody RequirementRequest requirementRequest) {
-        RequirementResponse requirementResponse = requirementService.updateRequirement(requirementRequest);
+    public ResponseEntity<ApiResponse<RequirementResponse>> updateRequirement(@RequestBody RequirementRequest requirementRequest) {
+        ApiResponse <RequirementResponse> requirementResponse = requirementService.updateRequirement(requirementRequest);
         return new ResponseEntity<>(requirementResponse, HttpStatus.OK);
     }
     @GetMapping
