@@ -13,7 +13,7 @@ public interface JobpositionService {
 
     JobPositionResponse updatePosition(JobPositionRequest request);
 
-    JobPositionResponse findPosition(int id);
+    ApiResponse<JobPositionResponse> findPosition(int id);
 
     JobPositionEntity deleteJobPosittion(int id);
 }

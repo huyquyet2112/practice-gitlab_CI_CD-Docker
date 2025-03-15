@@ -1,8 +1,12 @@
 package org.example.quanlytuyendung.dto.response;
 
-import lombok.Data;
+import lombok.*;
 
-@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
+
 public class PositionResponse {
     private Integer id;
     private String name;

@@ -4,12 +4,11 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.example.quanlytuyendung.dto.request.JobPositionRequest;
 import org.example.quanlytuyendung.dto.request.PositionRequest;
-import org.example.quanlytuyendung.dto.response.ApiResponse;
-import org.example.quanlytuyendung.dto.response.JobPositionResponse;
-import org.example.quanlytuyendung.dto.response.LineResponse;
-import org.example.quanlytuyendung.dto.response.PageableResponse;
+import org.example.quanlytuyendung.dto.response.*;
 import org.example.quanlytuyendung.entity.JobPositionEntity;
 import org.example.quanlytuyendung.entity.JobPositionEntityMap;
+import org.example.quanlytuyendung.feignclient.DepartmentClient;
+import org.example.quanlytuyendung.feignclient.PositionClient;
 import org.example.quanlytuyendung.mapper.IndustryMapper;
 import org.example.quanlytuyendung.mapper.JobPositionMapper;
 import org.example.quanlytuyendung.repository.JobPositionRepository;
@@ -33,7 +32,8 @@ public class JobPositionServiceImpl  implements JobpositionService {
     private final JobPositionRepository jobPositionRepository;
     private final JobPositiopMapRepository jobPositiopMapRepository;
     private final JobPositionMapper jobPositionMapper;
-
+    private final PositionClient positionClient;
+    private final DepartmentClient departmentClient;
 
     @Override
     public ApiResponse<PageableResponse<JobPositionResponse>> findAll(int page, int size,String search,String sort) {
@@ -60,7 +60,7 @@ public class JobPositionServiceImpl  implements JobpositionService {
                 .numberOfElements(jobPositionEntities.getNumberOfElements())
                 .content(jobPositionEntities.getContent().stream()
                         .map(jobPositionMapper::toResponseList)
-                        .collect(Collectors.toList()))
+                        .toList())
                 .build();
 
         return new ApiResponse<>(pageableResponse);
@@ -158,12 +158,41 @@ return new ApiResponse<>( new JobPositionResponse(jobPositionEntity.getId()));
 
 
     @Override
-    public JobPositionResponse findPosition(int id) {
+    public ApiResponse<JobPositionResponse> findPosition(int id) {
         JobPositionEntity jobPositionEntity = jobPositionRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Job Position not found!"));
-        List<JobPositionEntityMap> jobPositionEntityMaps = jobPositiopMapRepository.findByJobPosition(jobPositionEntity);
-        return jobPositionMapper.toResponseDetails(jobPositionEntity, jobPositionEntityMaps);
+
+        List<JobPositionEntityMap> mappings = jobPositiopMapRepository.findByJobPosition(jobPositionEntity);
+
+        Set<Integer> departmentIds = mappings.stream().map(JobPositionEntityMap::getDepartmentId).collect(Collectors.toSet());
+        Set<Integer> positionIds = mappings.stream().map(JobPositionEntityMap::getPositionId).collect(Collectors.toSet());
+
+        var departmentResponse = departmentClient.getDepartmentsByIds(new ArrayList<>(departmentIds)).getData().getContent();
+        var positionResponse = positionClient.getPositionsByIds(new ArrayList<>(positionIds)).getData().getContent();
+
+        List<DepartmentResponse> departmentResponses = departmentResponse.stream().toList();
+        List<PositionResponse> positionResponses = positionResponse.stream().toList();
+
+        Map<Integer, DepartmentResponse> departmentResponseMap = departmentResponses.stream().collect(Collectors.toMap(DepartmentResponse::getId,d ->d));
+        Map<Integer,PositionResponse> positionResponseMap = positionResponses.stream().collect(Collectors.toMap(PositionResponse::getId,p ->p));
+
+        List<LineResponse> lines = departmentIds.stream().map(
+                deptId -> {
+                    DepartmentResponse departmentResponse1 = departmentResponseMap.get(deptId);
+                    List<PositionResponse> positionResponses1 = mappings.stream()
+                            .filter(d -> d.getDepartmentId() != null && d.getDepartmentId().equals(deptId))
+                            .map(p -> positionResponseMap.get(p.getPositionId()))
+                            .filter(Objects::nonNull)
+                            .toList();
+                    return new LineResponse(departmentResponse1, positionResponses1);
+                }
+        ).toList();
+        return new ApiResponse<>(jobPositionMapper.toResponseDetails(jobPositionEntity, lines));
+
     }
+
+
+    
 
     @Override
     public JobPositionEntity deleteJobPosittion(int id) {

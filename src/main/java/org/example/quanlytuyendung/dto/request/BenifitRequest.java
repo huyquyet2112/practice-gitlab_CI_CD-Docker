@@ -6,6 +6,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.example.quanlytuyendung.dto.response.BenifitMapResponse;
 
+import java.util.List;
+
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
@@ -15,7 +17,7 @@ public class BenifitRequest {
     private String name;
 
     private String code;
-    private DepartmentRequest department;
+    private List<DepartmentRequest> department;
     private Boolean isActive;
     private String description;
 

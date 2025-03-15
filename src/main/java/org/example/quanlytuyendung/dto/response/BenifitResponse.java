@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
@@ -16,7 +18,7 @@ public class BenifitResponse {
 
     private Boolean isActive;
     private String description;
-    private DepartmentResponse department;
+    private List<DepartmentResponse> department;
 
     public BenifitResponse(Integer id) {
         this.id = id;

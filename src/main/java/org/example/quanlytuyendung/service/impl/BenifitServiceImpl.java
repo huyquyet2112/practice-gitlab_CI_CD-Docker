@@ -1,7 +1,10 @@
 package org.example.quanlytuyendung.service.impl;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.example.quanlytuyendung.dto.request.BenifitRequest;
+import org.example.quanlytuyendung.dto.request.DepartmentRequest;
 import org.example.quanlytuyendung.dto.response.ApiResponse;
 import org.example.quanlytuyendung.dto.response.BenifitResponse;
 import org.example.quanlytuyendung.dto.response.DepartmentResponse;
@@ -22,12 +25,12 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-
+@Log4j2
 public class BenifitServiceImpl implements BenifitService {
     private final BenifitRepository benifitRepository;
     private final BenifitMapRepsitory benifitMapRepsitory;
@@ -37,7 +40,7 @@ public class BenifitServiceImpl implements BenifitService {
 
 
     @Override
-    public ApiResponse<PageableResponse<BenifitResponse>> getBenifit(int page, int size, String search,String sort) {
+    public ApiResponse<PageableResponse<BenifitResponse>> getBenifit(int page, int size, String search, String sort) {
         String[] sortParams = sort.split(":");
         String sortField = sortParams[0];
         Sort.Direction sortDirection = sortParams.length > 1 && sortParams[1].equalsIgnoreCase("ASC")
@@ -52,8 +55,6 @@ public class BenifitServiceImpl implements BenifitService {
             filter.put("code", search);
         }
 
-
-
         Specification<BenifitEntity> specification = new BaseSpecification<>(filter);
         Page<BenifitEntity> result = benifitRepository.findAll(specification, pageable);
 
@@ -65,13 +66,22 @@ public class BenifitServiceImpl implements BenifitService {
                 .totalElements(result.getTotalElements())
                 .numberOfElements(result.getNumberOfElements())
                 .content(result.getContent().stream().map(benifit -> {
-                    BenifitMapEntity benifitMap = benifitMapRepsitory.findByBenifit(benifit);
-                    return benifitMapper.mapBenifit(benifit, benifitMap);
+
+                    List<BenifitMapEntity> benifitMaps = benifitMapRepsitory.findAllByBenifit(benifit);
+                    List<Integer> departmentId = benifitMaps.stream().map(BenifitMapEntity::getDepartment).toList();
+                    List<DepartmentResponse> departmentResponses = new ArrayList<>();
+                    if(!departmentId.isEmpty()) {
+                        ApiResponse<PageableResponse<DepartmentResponse>> departmentResponseApiResponse = departmentClient.getDepartmentsByIds(departmentId);
+                        departmentResponses = departmentResponseApiResponse.getData().getContent();
+                    }
+
+                    return benifitMapper.mapBenifit1(benifit, benifitMaps,departmentResponses);
                 }).toList())
                 .build();
 
         return new ApiResponse<>(pageableResponse);
     }
+
 
 
     @Override
@@ -81,11 +91,15 @@ public class BenifitServiceImpl implements BenifitService {
         benifit.setName(benifitRequest.getName());
         benifit.setDescription(benifitRequest.getDescription());
         benifit.setIsActive(benifitRequest.getIsActive());
-        BenifitMapEntity benifitMapEntity = new BenifitMapEntity();
-        benifitMapEntity.setBenifit(benifit);
-        benifitMapEntity.setDepartment(benifitRequest.getDepartment().getId());
         benifitRepository.save(benifit);
-        benifitMapRepsitory.save(benifitMapEntity);
+        List<BenifitMapEntity> benifitMapEntityList = new ArrayList<>();
+        for(DepartmentRequest departmentRequest : benifitRequest.getDepartment()){
+            BenifitMapEntity benifitMapEntity = new BenifitMapEntity();
+            benifitMapEntity.setBenifit(benifit);
+            benifitMapEntity.setDepartment(departmentRequest.getId());
+            benifitMapEntityList.add(benifitMapEntity);
+        }
+        benifitMapRepsitory.saveAll(benifitMapEntityList);
         return new ApiResponse<>(new BenifitResponse(benifit.getId()));
 
 
@@ -93,53 +107,65 @@ public class BenifitServiceImpl implements BenifitService {
     }
 
     @Override
+    @Transactional
     public ApiResponse<BenifitResponse> updateBenifit(BenifitRequest benifitRequest) {
-        BenifitEntity benifit = benifitRepository.findById(benifitRequest.getId()).orElse(null);
+        BenifitEntity benifit = benifitRepository.findById(benifitRequest.getId())
+                .orElseThrow(() -> new RuntimeException("Benefit not found for ID: " + benifitRequest.getId()));
+
         benifit.setDescription(benifitRequest.getDescription());
         benifit.setIsActive(benifitRequest.getIsActive());
         benifit.setCode(benifitRequest.getCode());
         benifit.setName(benifitRequest.getName());
-        BenifitMapEntity benifitMapEntity = benifitMapRepsitory.findById(benifit.getId()).orElse(null);
-
-        benifitMapEntity.setDepartment(benifitRequest.getDepartment().getId());
         benifitRepository.save(benifit);
-        benifitMapRepsitory.save(benifitMapEntity);
+
+        List<BenifitMapEntity> benifitMapEntityList = benifitMapRepsitory.findByBenifit(benifit);
+        Set<Integer> departmentId = benifitRequest.getDepartment().stream().map(DepartmentRequest::getId).collect(Collectors.toSet());
+        List<BenifitMapEntity> benifitMapEntities = benifitMapEntityList.stream().filter(item -> !departmentId.contains(item.getId())).collect(Collectors.toList());
+        benifitMapRepsitory.deleteAll(benifitMapEntities);
+        List<BenifitMapEntity> toAdd = new ArrayList<>();
+        for(Integer newdepartmentId : departmentId){
+            boolean exists = benifitMapRepsitory.existsById(newdepartmentId);
+            if(exists){
+                BenifitMapEntity benifitMapEntity = new BenifitMapEntity();
+                benifitMapEntity.setDepartment(newdepartmentId);
+                benifitMapEntity.setBenifit(benifit);
+                toAdd.add(benifitMapEntity);
+            }
+        }
+        benifitMapRepsitory.saveAll(toAdd);
         return new ApiResponse<>(new BenifitResponse(benifit.getId()));
     }
+
+
 
     @Override
     public ApiResponse<BenifitResponse> getBenifitId(int id) {
         BenifitEntity benifit = benifitRepository.findById(id).orElse(null);
-        if (benifit == null) {
-            return new ApiResponse<>(null);
+
+        List<BenifitMapEntity> benifitMaps = benifitMapRepsitory.findAllByBenifit(benifit);
+        List<Integer> departmentIds = benifitMaps.stream()
+                .map(BenifitMapEntity::getDepartment)
+                .toList();
+
+
+        List<DepartmentResponse> departmentList = new ArrayList<>();
+        if (!departmentIds.isEmpty()) {
+            ApiResponse<PageableResponse<DepartmentResponse>> response =
+                    departmentClient.getDepartmentsByIds(departmentIds);
+            departmentList = response.getData().getContent();
         }
-
-        BenifitMapEntity benifitMapEntity = benifitMapRepsitory.findByBenifit(benifit);
-        if (benifitMapEntity == null) {
-            return new ApiResponse<>(null);
-        }
-
-        // Gọi Feign Client để lấy thông tin phòng ban
-        ApiResponse<DepartmentResponse> departmentApiResponse = departmentClient.getDepartmentById(benifitMapEntity.getDepartment());
-        DepartmentResponse department = departmentApiResponse.getData();
-
-        BenifitResponse benifitResponse = new BenifitResponse();
-        benifitResponse.setId(benifit.getId());
-        benifitResponse.setName(benifit.getName());
-        benifitResponse.setDescription(benifit.getDescription());
-        benifitResponse.setCode(benifit.getCode());
-        benifitResponse.setIsActive(benifit.getIsActive());
-        benifitResponse.setDepartment(department); // Gán department đúng kiểu dữ liệu
+        BenifitResponse benifitResponse = benifitMapper.mapBenifit1(benifit, benifitMaps, departmentList);
 
         return new ApiResponse<>(benifitResponse);
     }
 
 
+
     @Override
     public BenifitEntity deleteBenifit(int id) {
         BenifitEntity benifit = benifitRepository.findById(id).orElse(null);
-        BenifitMapEntity benifitMapEntity = benifitMapRepsitory.findByBenifit(benifit);
-        benifitMapRepsitory.delete(benifitMapEntity);
+        List<BenifitMapEntity> benifitMapEntity = benifitMapRepsitory.findByBenifit(benifit);
+        benifitMapRepsitory.deleteAll(benifitMapEntity);
         benifitRepository.delete(benifit);
         return null;
     }

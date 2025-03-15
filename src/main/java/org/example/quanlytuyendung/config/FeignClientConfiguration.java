@@ -3,14 +3,19 @@ package org.example.quanlytuyendung.config;
 import feign.Logger;
 import feign.RequestInterceptor;
 import feign.RequestTemplate;
+import feign.jackson.JacksonDecoder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class FeignClientConfiguration {
     @Bean
-    Logger.Level feignLoggerLevel() {
+    public Logger.Level feignLoggerLevel() {
         return Logger.Level.FULL;
+    }
+    @Bean
+    public JacksonDecoder feignDecoder() {
+        return new JacksonDecoder();
     }
     @Bean
     public RequestInterceptor requestInterceptor() {

@@ -44,8 +44,8 @@ public class JobPositionController {
         return ResponseEntity.ok(response);
     }
     @GetMapping
-    public ResponseEntity<JobPositionResponse> getJobPosition(@RequestParam int id) {
-        JobPositionResponse jobPositionResponse = jobpositionService.findPosition(id);
+    public ResponseEntity<ApiResponse<JobPositionResponse>> getJobPosition(@RequestParam int id) {
+        ApiResponse<JobPositionResponse> jobPositionResponse = jobpositionService.findPosition(id);
         return ResponseEntity.ok(jobPositionResponse);
     }
     @DeleteMapping

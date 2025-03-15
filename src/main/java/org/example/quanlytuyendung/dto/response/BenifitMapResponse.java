@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
@@ -12,6 +14,6 @@ import lombok.NoArgsConstructor;
 public class BenifitMapResponse {
     private Integer id;
  // Chứa toàn bộ thông tin từ BenifitResponse
-    private DepartmentResponse department;
+    private List<DepartmentResponse> department;
 
 }
