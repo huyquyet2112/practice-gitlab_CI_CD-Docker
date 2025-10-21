@@ -1,3 +1,11 @@
+## About This Project
+
+The original project was created by [CongNguyen2605](https://github.com/CongNguyen2605).  
+I am using this repository as a practice environment to implement and experiment with GitLab CI/CD pipelines and Docker.
+
+All GitLab CI/CD configurations, Docker workflows, and related improvements in this repository were developed by me for the purpose of learning and honing DevOps skills.
+
+> **Note:** Credits for the original source code and project structure belong to the original author.
 # warehouse-service
 
 ## Dependencies
